@@ -1,8 +1,11 @@
 package com.wzy.lamanpro.activity;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.ui.CommonBaseDialog;
+import com.wzy.lamanpro.ui.CommonDialog;
+import com.wzy.lamanpro.utils.SPUtility;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -80,19 +86,21 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        switch (item.getItemId()) {
+            case R.id.nav_camera:
+                break;
+            case R.id.nav_gallery:
+                break;
+            case R.id.nav_slideshow:
+                break;
+            case R.id.nav_manage:
+                break;
+            case R.id.nav_setting:
+                startActivity(new Intent(Main2Activity.this, SettingsActivity.class));
+                break;
+            case R.id.nav_logout:
+                showStyleDialog();
+                break;
 
         }
 
@@ -100,4 +108,43 @@ public class Main2Activity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    private void showStyleDialog() {
+        //使用 CommonBaseDialog核心代码
+//        CommonBaseDialog.showDialog(this, R.layout.common_dialog)
+//                .setText(R.id.title, "温 馨 提 示 :")
+//                .setDialogLocation(Gravity.CENTER, 50, 0, 50, 0)
+//                .setText(R.id.message, "您确定注销吗？")
+//                .setViewListener(new CommonBaseDialog.OnCloseListener() {
+//                    @Override
+//                    public void onClick(Dialog dialog, int viewId) {
+//                        switch (viewId) {
+//                            case R.id.yes:
+//                                SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
+//                                finish();
+//                                startActivity(new Intent(Main2Activity.this, LoginActivity.class));
+//                                break;
+//                            case R.id.no:
+//                                break;
+//                        }
+//                        dialog.dismiss();
+//                    }
+//                }, R.id.no, R.id.yes);
+
+        CommonDialog commonDialog = new CommonDialog(this);
+        commonDialog.setTitle("温 馨 提 示 :");
+        commonDialog.setMessage("您确定注销吗？");
+        commonDialog.setRightButtonClickListener(new CommonDialog.RightButtonClickListener() {
+            @Override
+            public void onRightButtonClick() {
+                SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
+                finish();
+                Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+        commonDialog.show();
+    }
+
 }
