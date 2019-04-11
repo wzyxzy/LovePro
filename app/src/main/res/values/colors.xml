@@ -5,4 +5,10 @@
     <color name="colorAccent">#D81B60</color>
     <color name="transParent">#00000000</color>
     <color name="transLucent">#60000000</color>
+    <color name="txt_black">#000000</color>
+    <color name="txt_black_light">#333333</color>
+    <color name="bg_white">#FFFFFF</color>
+    <color name="bg_blue">#58ACED</color>
+    <color name="bg_dia_blue">#3358ACED</color>
+    <color name="text_yellow">#FFC800</color>
 </resources>

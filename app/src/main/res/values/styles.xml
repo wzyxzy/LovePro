@@ -42,4 +42,10 @@
         <item name="android:windowBackground">@color/transLucent</item><!--除去背景色-->
     </style>
 
+    <style name="CommonPopup" parent="AppTheme">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item><!--半透明-->
+        <item name="android:windowBackground">@color/bg_white</item><!--除去背景色-->
+    </style>
+
 </resources>

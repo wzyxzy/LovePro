@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="use_mode"
+        android:summary="是否为精检模式，当前为快检模式"
+        android:title="精检" />
+
+    <EditTextPreference
+        android:dialogTitle="积分时间"
+        android:key="time"
+        android:summary="请填入积分时间"
+        android:title="积分时间" />
+
+    <EditTextPreference
+        android:dialogTitle="积分次数"
+        android:key="once"
+        android:summary="请填入积分次数"
+        android:title="积分次数" />
+
+
+</PreferenceScreen>

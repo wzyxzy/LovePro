@@ -1,10 +1,18 @@
 package com.wzy.lamanpro.activity;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbManager;
+import android.hardware.usb.UsbRequest;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -15,14 +23,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.ui.CommonBaseDialog;
 import com.wzy.lamanpro.ui.CommonDialog;
 import com.wzy.lamanpro.utils.SPUtility;
+import com.wzy.lamanpro.utils.UsbUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private boolean canUseUsb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +46,7 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        canUseUsb = UsbUtils.initUsbData(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +93,8 @@ public class Main2Activity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            startActivity(new Intent(Main2Activity.this, SettingTest.class));
             return true;
         }
 
@@ -111,26 +130,6 @@ public class Main2Activity extends AppCompatActivity
 
 
     private void showStyleDialog() {
-        //使用 CommonBaseDialog核心代码
-//        CommonBaseDialog.showDialog(this, R.layout.common_dialog)
-//                .setText(R.id.title, "温 馨 提 示 :")
-//                .setDialogLocation(Gravity.CENTER, 50, 0, 50, 0)
-//                .setText(R.id.message, "您确定注销吗？")
-//                .setViewListener(new CommonBaseDialog.OnCloseListener() {
-//                    @Override
-//                    public void onClick(Dialog dialog, int viewId) {
-//                        switch (viewId) {
-//                            case R.id.yes:
-//                                SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
-//                                finish();
-//                                startActivity(new Intent(Main2Activity.this, LoginActivity.class));
-//                                break;
-//                            case R.id.no:
-//                                break;
-//                        }
-//                        dialog.dismiss();
-//                    }
-//                }, R.id.no, R.id.yes);
 
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setTitle("温 馨 提 示 :");
@@ -146,5 +145,6 @@ public class Main2Activity extends AppCompatActivity
         });
         commonDialog.show();
     }
+
 
 }
