@@ -20,7 +20,7 @@
     <string name="nav_header_title">竹天探索-拉曼</string>
     <string name="nav_header_subtitle">ztts@wzy.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">模式设定</string>
     <string name="title_activity_main3">Main3Activity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>

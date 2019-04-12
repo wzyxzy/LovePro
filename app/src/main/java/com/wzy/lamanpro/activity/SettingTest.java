@@ -10,19 +10,43 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.wzy.lamanpro.R;
 
-public class SettingTest extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+public class SettingTest extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+
+    private Preference time;
+    private Preference once;
+    private Preference power;
+    private CheckBoxPreference cbp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_setmode);
+        time = findPreference("time");
+        once = findPreference("once");
+        power = findPreference("power");
 //        bindPreferenceSummaryToValue(findPreference("use_mode"));
-        bindPreferenceSummaryToValue(findPreference("time"));
-        bindPreferenceSummaryToValue(findPreference("once"));
+        bindPreferenceSummaryToValue(time);
+        bindPreferenceSummaryToValue(once);
+        bindPreferenceSummaryToValue(power);
+        cbp = (CheckBoxPreference) findPreference("use_mode");
+
+        cbp.setOnPreferenceClickListener(this);
+        if (cbp.isChecked()) {
+            time.setEnabled(true);
+            once.setEnabled(true);
+            cbp.setSummary("当前为精检模式");
+
+        }else {
+            time.setEnabled(false);
+            once.setEnabled(false);
+            cbp.setSummary("当前为快检模式");
+        }
+
 
     }
 
@@ -46,11 +70,26 @@ public class SettingTest extends PreferenceActivity implements Preference.OnPref
         String stringValue = newValue.toString();
         if (preference instanceof CheckBoxPreference) {
 
-
-        }else{
+        } else {
             preference.setSummary(stringValue);
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+
+        if (cbp.isChecked()) {
+            time.setEnabled(true);
+            once.setEnabled(true);
+            cbp.setSummary("当前为精检模式");
+
+        }else {
+            time.setEnabled(false);
+            once.setEnabled(false);
+            cbp.setSummary("当前为快检模式");
+        }
+         return true;
     }
 }
