@@ -1,21 +1,10 @@
 package com.wzy.lamanpro.activity;
 
-import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbEndpoint;
-import android.hardware.usb.UsbInterface;
-import android.hardware.usb.UsbManager;
-import android.hardware.usb.UsbRequest;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,18 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.TextView;
 
 import com.wzy.lamanpro.R;
-import com.wzy.lamanpro.ui.CommonBaseDialog;
 import com.wzy.lamanpro.ui.CommonDialog;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -65,6 +49,9 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView textView = (TextView) headerView.findViewById(R.id.textView);
+        textView.setText(SPUtility.getUserId(this));
     }
 
     @Override
@@ -91,11 +78,14 @@ public class Main2Activity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        switch (id){
+            case R.id.action_settings:
+                startActivity(new Intent(Main2Activity.this, SettingTest.class));
+                return true;
+            case R.id.action_report:
 
-            startActivity(new Intent(Main2Activity.this, SettingTest.class));
-            return true;
+                break;
+
         }
 
         return super.onOptionsItemSelected(item);

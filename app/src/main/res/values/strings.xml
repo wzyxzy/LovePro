@@ -99,4 +99,5 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_setting_test">模式设定</string>
+    <string name="action_test_report">测试报告</string>
 </resources>
