@@ -1,6 +1,10 @@
 package com.wzy.lamanpro.utils;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -17,6 +21,7 @@ import java.util.Iterator;
 
 public class UsbUtils {
 
+    private static final String ACTION_DEVICE_PERMISSION = "ACTION_DEVICE_PERMISSION";
     //设备列表
     private static HashMap<String, UsbDevice> deviceList;
     //USB管理器:负责管理USB设备的类
@@ -38,6 +43,11 @@ public class UsbUtils {
 
     public static boolean initUsbData(Context context) {
         UsbUtils.context = context;
+        IntentFilter usbFilter = new IntentFilter();
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        context.registerReceiver(mUsbReceiver, usbFilter);
+
 
         // 获取USB设备
         manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
@@ -85,7 +95,14 @@ public class UsbUtils {
                     return false;
                 }
             } else {
-                showTmsg("没有权限");
+                UsbPermissionReceiver usbPermissionReceiver = new UsbPermissionReceiver();
+                Intent intent = new Intent(ACTION_DEVICE_PERMISSION);
+                PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+                IntentFilter permissionFilter = new IntentFilter(ACTION_DEVICE_PERMISSION);
+                context.registerReceiver(usbPermissionReceiver, permissionFilter);
+                manager.requestPermission(mUsbDevice, mPermissionIntent);
+
+                showTmsg("没有权限，请授权！");
                 return false;
             }
         } else {
@@ -95,6 +112,42 @@ public class UsbUtils {
 
 
     }
+
+    private static class UsbPermissionReceiver extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_DEVICE_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device.getDeviceName().equals(mUsbDevice.getDeviceName())) {
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            //授权成功,在这里进行打开设备操作
+                            initUsbData(context);
+                        } else {
+                            initUsbData(context);
+                            //授权失败
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 用于检测usb插入状态的BroadcasReceiver
+     */
+    private final static BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                //设备插入
+                initUsbData(context);
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                //设备移除
+            }
+        }
+    };
+
 
     public static void sendToUsb(byte[] content) {
         sendbytes = content;
@@ -142,12 +195,12 @@ public class UsbUtils {
      * @return
      */
     public static byte[] hexToByteArray(String str) {
-        if(str == null || str.trim().equals("")) {
+        if (str == null || str.trim().equals("")) {
             return new byte[0];
         }
 
         byte[] bytes = new byte[str.length() / 2];
-        for(int i = 0; i < str.length() / 2; i++) {
+        for (int i = 0; i < str.length() / 2; i++) {
             String subStr = str.substring(i * 2, i * 2 + 2);
             bytes[i] = (byte) Integer.parseInt(subStr, 16);
         }

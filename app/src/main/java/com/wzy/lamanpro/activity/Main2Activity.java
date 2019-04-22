@@ -182,7 +182,7 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
-
+                canUseUsb = UsbUtils.initUsbData(this);
                 if (canUseUsb) {
                     final int[] count = {0};
                     final Timer timer = new Timer();
@@ -209,7 +209,7 @@ public class Main2Activity extends AppCompatActivity
                                             value.append(UsbUtils.repeat(16 - value.length(), "0"));
                                         }
                                         UsbUtils.sendToUsb(UsbUtils.hexToByteArray(value.toString()));
-                                    }catch (NumberFormatException e){
+                                    } catch (NumberFormatException e) {
                                         handler.sendEmptyMessage(1);
 
                                     }

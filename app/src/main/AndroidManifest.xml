@@ -51,9 +51,9 @@
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
             <!-- 以下这个meta-data是要手工增加上，他是用来过滤你的具体USB设备的，其中的device_filter是个xml文件 -->
-            <meta-data
-                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter" />
+            <!--<meta-data-->
+                <!--android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"-->
+                <!--android:resource="@xml/device_filter" />-->
         </activity>
         <activity
             android:name=".activity.FirstActivity"
