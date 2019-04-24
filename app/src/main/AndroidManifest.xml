@@ -12,6 +12,10 @@
         android:name="android.hardware.usb.host"
         android:required="true" />
 
+    <uses-permission
+        android:name="android.hardware.usb.host"
+        android:required="false" />
+
     <application
         android:name=".common.LaManApplication"
         android:allowBackup="true"
