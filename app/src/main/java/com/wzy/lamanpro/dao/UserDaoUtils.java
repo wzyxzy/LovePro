@@ -71,6 +71,18 @@ public class UserDaoUtils {
     }
 
     /**
+     * 查询用户密码
+     */
+    public String queryUserName(String account) {
+
+        QueryBuilder<Users> qb = usersDao.queryBuilder();
+        qb.where(UsersDao.Properties.Account.eq(account));
+        if (qb.list() == null || qb.list().size() == 0)
+            return "";
+        return qb.list().get(0).getName();
+    }
+
+    /**
      * 查询用户列表个数
      */
     public int queryAccountSize() {

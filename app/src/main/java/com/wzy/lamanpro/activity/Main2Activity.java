@@ -26,7 +26,9 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.bean.UsersDao;
 import com.wzy.lamanpro.common.LaManApplication;
+import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.ui.CommonDialog;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
@@ -122,7 +124,8 @@ public class Main2Activity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         TextView textView = (TextView) headerView.findViewById(R.id.textView);
-        textView.setText(SPUtility.getUserId(this));
+
+        textView.setText(new UserDaoUtils(this).queryUserName(SPUtility.getUserId(this)));
     }
 
     @Override
