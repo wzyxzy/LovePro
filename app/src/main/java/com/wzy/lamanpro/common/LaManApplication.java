@@ -12,6 +12,7 @@ public class LaManApplication extends Application {
 
 
     private static LaManApplication appContext;
+    public static boolean canUseUsb;
 
     public static LaManApplication getInstance() {
         return appContext;

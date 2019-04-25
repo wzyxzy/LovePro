@@ -14,6 +14,8 @@ import android.hardware.usb.UsbRequest;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.wzy.lamanpro.common.LaManApplication;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -43,11 +45,6 @@ public class UsbUtils {
 
     public static boolean initUsbData(Context context) {
         UsbUtils.context = context;
-        IntentFilter usbFilter = new IntentFilter();
-        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        context.registerReceiver(mUsbReceiver, usbFilter);
-
 
         // 获取USB设备
         manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
@@ -122,31 +119,18 @@ public class UsbUtils {
                     if (device.getDeviceName().equals(mUsbDevice.getDeviceName())) {
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                             //授权成功,在这里进行打开设备操作
-                            initUsbData(context);
+                            showTmsg("已授权！");
+                            LaManApplication.canUseUsb = true;
                         } else {
-                            initUsbData(context);
+                            showTmsg("授权失败！");
                             //授权失败
+                            LaManApplication.canUseUsb = false;
                         }
                     }
                 }
             }
         }
     }
-
-    /**
-     * 用于检测usb插入状态的BroadcasReceiver
-     */
-    private final static BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                //设备插入
-                initUsbData(context);
-            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                //设备移除
-            }
-        }
-    };
 
 
     public static void sendToUsb(byte[] content) {

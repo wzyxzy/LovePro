@@ -1,7 +1,11 @@
 package com.wzy.lamanpro.activity;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +26,7 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.common.LaManApplication;
 import com.wzy.lamanpro.ui.CommonDialog;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
@@ -31,7 +36,7 @@ import java.util.TimerTask;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
-    private boolean canUseUsb;
+
     private Toolbar toolbar;
     private LineChart lineChart;
     private Button button_start;
@@ -58,13 +63,45 @@ public class Main2Activity extends AppCompatActivity
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter usbFilter = new IntentFilter();
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        registerReceiver(mUsbReceiver, usbFilter);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mUsbReceiver);
+    }
+
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+//            tvInfo.append("BroadcastReceiver in\n");
+
+            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                Toast.makeText(Main2Activity.this, "USB设备已连接！", Toast.LENGTH_SHORT).show();
+                LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this);
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                Toast.makeText(Main2Activity.this, "USB设备已移除！", Toast.LENGTH_SHORT).show();
+                LaManApplication.canUseUsb = false;
+            }
+        }
+    };
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         initView();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        canUseUsb = UsbUtils.initUsbData(this);
+        LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -182,8 +219,8 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
-                canUseUsb = UsbUtils.initUsbData(this);
-                if (canUseUsb) {
+//                canUseUsb = UsbUtils.initUsbData(this);
+                if (LaManApplication.canUseUsb) {
                     final int[] count = {0};
                     final Timer timer = new Timer();
                     TimerTask timerTask = new TimerTask() {
