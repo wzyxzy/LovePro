@@ -9,6 +9,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.UserManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -177,6 +178,7 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_slideshow:
                 break;
             case R.id.nav_manage:
+                startActivity(new Intent(Main2Activity.this, ManageUsers.class));
                 break;
             case R.id.nav_setting:
                 startActivity(new Intent(Main2Activity.this, SettingsActivity.class));

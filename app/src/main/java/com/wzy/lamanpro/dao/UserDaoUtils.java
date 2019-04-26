@@ -12,6 +12,8 @@ import com.wzy.lamanpro.common.CommonActivity;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.util.List;
+
 public class UserDaoUtils {
     private UsersDao usersDao;
     private Context context;
@@ -88,6 +90,14 @@ public class UserDaoUtils {
     public int queryAccountSize() {
         QueryBuilder<Users> qb = usersDao.queryBuilder();
         return qb.list().size();
+    }
+
+    /**
+     * 查询所有用户列表
+     */
+    public List<Users> queryAllUsers() {
+        QueryBuilder<Users> qb = usersDao.queryBuilder();
+        return qb.list();
     }
 
     /**

@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.bean.Users;
 import com.wzy.lamanpro.common.CommonActivity;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.SPUtility;
@@ -58,6 +59,10 @@ public class LoginActivity extends CommonActivity {
     }
 
     private void initData() {
+        UserDaoUtils userDaoUtils = new UserDaoUtils(this);
+        if (userDaoUtils.queryUserSize("admin") == 0) {
+            userDaoUtils.insertUserList(new Users("0001", "admin", "admin", "admin", "admin@laman.com"));
+        }
         if (SPUtility.getSPBoolean(LoginActivity.this, "isAutoLogin")) {
             mAuthTask = new UserLoginTask(SPUtility.getUserId(this), SPUtility.getSPString(this, "password"));
             mAuthTask.execute((Void) null);
@@ -232,7 +237,7 @@ public class LoginActivity extends CommonActivity {
             mAuthTask = null;
             showProgress(false);
 
-            switch (success){
+            switch (success) {
                 case 0:
                     SPUtility.putSPBoolean(LoginActivity.this, "isAutoLogin", checkbox.isChecked());
                     SPUtility.setUserId(LoginActivity.this, mAccount);

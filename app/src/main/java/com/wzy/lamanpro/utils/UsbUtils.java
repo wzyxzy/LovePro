@@ -136,13 +136,9 @@ public class UsbUtils {
     public static void sendToUsb(byte[] content) {
         sendbytes = content;
         int ret = -1;
-        // 发送准备命令
-        ret = mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 5000);
-        showTmsg("指令已经发送！");
-        // 接收发送成功信息(相当于读取设备数据)
-        receiveytes = new byte[128];   //根据设备实际情况写数据大小
-        ret = mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 10000);
-//        result_tv.setText(String.valueOf(ret));
+        ret = mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 50);
+//        receiveytes = new byte[128];
+//        ret = mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 50);
         Toast.makeText(context, String.valueOf(ret), Toast.LENGTH_SHORT).show();
     }
 
