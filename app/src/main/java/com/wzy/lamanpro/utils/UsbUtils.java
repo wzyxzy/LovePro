@@ -11,6 +11,9 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
+import android.os.Handler;
+import android.os.Message;
+import android.text.BoringLayout;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -43,6 +46,22 @@ public class UsbUtils {
     private static byte[] receiveytes;
     private static Context context;
 
+    private static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:
+
+                    showTmsg("指令已经发送！ret为" + msg.arg1 + msg.obj);
+                    break;
+                case 1:
+                    showTmsg("收到数据：" + bytesToHexString((byte[]) msg.obj));
+                    break;
+            }
+        }
+    };
+
     public static boolean initUsbData(Context context) {
         UsbUtils.context = context;
 
@@ -52,7 +71,7 @@ public class UsbUtils {
         deviceList = manager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
         while (deviceIterator.hasNext()) {
-            Log.e("ldm", "vid=" + deviceIterator.next().getVendorId() + "---pid=" + deviceIterator.next().getProductId());
+//            Log.e("ldm", "vid=" + deviceIterator.next().getVendorId() + "---pid=" + deviceIterator.next().getProductId());
             //if (mVendorID == usb.getVendorId() && mProductID == usb.getProductId()) {//找到指定设备
             mUsbDevice = deviceIterator.next();
         }
@@ -68,13 +87,28 @@ public class UsbUtils {
             mInterface = usbInterface;
             break;
         }
+        // 设置端点
+        for (int i = 0; i < mInterface.getEndpointCount(); i++) {
+            //if (mInterface.getEndpoint(1) != null)
+            // 端点地址,最高位表示方向
+            if ((mInterface.getEndpoint(i).getAddress() & 0x80) == 0x00) {
+
+//                Log.e("usbEpOut", "EpOut = " + String.format("%02X ", usbEpOut.getAddress()) + "i=" + i);
+            } else {
+//                usbEpIn = mInterface.getEndpoint(i);
+//                Log.e("usbEpOut", "EpIn = " + String.format("%02X ", usbEpIn.getAddress()) + "i=" + i);
+            }
+            Log.e("usbEpOut", "getAddress = " + mInterface.getEndpoint(i).getAddress() + ",getDirection = " + mInterface.getEndpoint(i).getDirection() + ",getAttributes = " + mInterface.getEndpoint(i).getAttributes() + ",getEndpointNumber = " + mInterface.getEndpoint(i).getEndpointNumber() + ",getInterval = " + mInterface.getEndpoint(i).getInterval() + ",getMaxPacketSize = " + mInterface.getEndpoint(i).getMaxPacketSize() + ",getType = " + mInterface.getEndpoint(i).getType());
+        }
+        usbEpOut = mInterface.getEndpoint(3);
+        usbEpIn = mInterface.getEndpoint(2);
         //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
-        if (mInterface.getEndpoint(1) != null) {
-            usbEpOut = mInterface.getEndpoint(1);
-        }
-        if (mInterface.getEndpoint(0) != null) {
-            usbEpIn = mInterface.getEndpoint(0);
-        }
+//        if (mInterface.getEndpoint(1) != null) {
+//            usbEpOut = mInterface.getEndpoint(1);
+//        }
+//        if (mInterface.getEndpoint(1) != null) {
+//            usbEpIn = mInterface.getEndpoint(1);
+//        }
         if (mInterface != null) {
             // 判断是否有权限
             if (manager.hasPermission(mUsbDevice)) {
@@ -121,6 +155,9 @@ public class UsbUtils {
                             //授权成功,在这里进行打开设备操作
                             showTmsg("已授权！");
                             LaManApplication.canUseUsb = true;
+                            //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
+                            initUsbData(context);
+//                            context.unregisterReceiver();
                         } else {
                             showTmsg("授权失败！");
                             //授权失败
@@ -132,35 +169,66 @@ public class UsbUtils {
         }
     }
 
-
     public static void sendToUsb(byte[] content) {
+        sendToUsb(content, false);
+    }
+
+    public static void sendToUsb(byte[] content, boolean isLast) {
         sendbytes = content;
         int ret = -1;
-        ret = mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 50);
-//        receiveytes = new byte[128];
-//        ret = mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 50);
-        Toast.makeText(context, String.valueOf(ret), Toast.LENGTH_SHORT).show();
+        // 发送准备命令
+        ret = mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 5000);
+//        showTmsg("指令已经发送！");
+
+        Message message1 = new Message();
+        message1.what = 0;
+        message1.arg1 = ret;
+        message1.obj = bytesToHexString(content);
+        handler.sendMessage(message1);
+        if (isLast) {
+            // 接收发送成功信息(相当于读取设备数据)
+            receiveytes = new byte[8192];   //根据设备实际情况写数据大小
+            ret = mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 10000);
+            Log.e("receive", bytesToHexString(receiveytes));
+            Message message2 = new Message();
+            message2.what = 0;
+            message2.arg1 = ret;
+            message2.obj = bytesToHexString(receiveytes);
+            handler.sendMessage(message2);
+        }
+
+//        Message message = new Message();
+//        message.what = 0;
+//        message.arg1 = ret;
+//        message.obj = bytesToHexString(receiveytes);
+//        handler.sendMessage(message);
+//        message.what = 0;
+//        message.arg1 = ret;
+//        handler.sendMessage(message);
+//        result_tv.setText(String.valueOf(ret));
+//        Toast.makeText(context, String.valueOf(ret), Toast.LENGTH_SHORT).show();
     }
 
     public static byte[] readFromUsb() {
-        //读取数据2
-        int outMax = usbEpOut.getMaxPacketSize();
-        int inMax = usbEpIn.getMaxPacketSize();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(inMax);
+//        //读取数据2
+//        int inMax = usbEpIn.getMaxPacketSize();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8192);
         UsbRequest usbRequest = new UsbRequest();
         usbRequest.initialize(mDeviceConnection, usbEpIn);
-        usbRequest.queue(byteBuffer, inMax);
+        usbRequest.queue(byteBuffer, 8192);
         if (mDeviceConnection.requestWait() == usbRequest) {
             byte[] retData = byteBuffer.array();
-            try {
-                showTmsg("收到数据：" + new String(retData, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            Log.e("receive",bytesToHexString(retData));
+            Message message = new Message();
+            message.what = 1;
+            message.obj = retData;
+            handler.sendMessage(message);
             return retData;
         }
         return null;
+
     }
+
 
 
     private static void showTmsg(String msg) {
