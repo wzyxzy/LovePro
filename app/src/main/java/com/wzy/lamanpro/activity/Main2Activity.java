@@ -25,13 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.common.LaManApplication;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.ui.CommonDialog;
+import com.wzy.lamanpro.utils.ChartUtil;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,23 +44,17 @@ import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    public static byte[] Z5_getFWVersion = {9, 79, 70, 86};//09:4f:46:56
-    public static final byte[] Z5_spectrumOneShot = {9, 79, 83, 79};//09:4f:53:4f//获取波形
-    byte[] Z5_getIntTime = {9, 79, 73, 84};//09:4f:49:54
-    byte[] Z5_setExternalPort = {9, 79, 101, 112, 2, 0, 0, 0};//09:4f:65:70//打开激光
-    byte[] Z5_closePort = {9, 79, 101, 112, 0, 0, 0, 0};//09:4f:65:70//关闭激光
-    byte[] Z5_setIntTime = {9, 79, 105, 116, 32, (byte) 161, 7, 0};//09:4f:69:74//设置积分时间
-    byte[] Z5_setPWM = {9, 79, 112, 119, 0, 0, 0, 0, (byte) 232, 3, 0, 0, 66, 0, 0, 0};//09:4f:70:77
-    byte[] Z5_spectrumAcquire = {9, 79, 83, 81};//09:4f:53:51
-    byte[] Z5_spectrumContinueStart = {9, 79, 83, 67, 1, 0, 0, 0};//09:4f:53:43:01:00:00:00
-    byte[] Z5_spectrumContinueStop = {9, 79, 83, 67, 0, 0, 0, 0};//09:4f:53:43:00:00:00:00
-    private Toolbar toolbar;
+    private static final byte[] SET_INIT_TIME = {0x09, 0x4F, 0x69, 0x74};//设置积分时间
+    private static final byte[] SET_POWER = {0x09, 0x4F, 0x70, 0x77, 0x00, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03, 0x00, 0x00, 0x42, 0x00, 0x00, 0x00};//设置能量大小
+    private static final byte[] OPEN_PORT = {0x09, 0x4f, 0x65, 0x70, 0x02, 0x00, 0x00, 0x00};//打开激光
+    private static final byte[] GET_DATA = {0x09, 0x4F, 0x53, 0x4F};//获取波形
+    private static final byte[] CLOSE_PORT = {0x09, 0x4f, 0x65, 0x70, 0x00, 0x00, 0x00, 0x00};//关闭激光
+    private static byte[] results;
     private LineChart lineChart;
     private Button button_start;
     private TextView text_report;
-    private FloatingActionButton fab;
-    private NavigationView nav_view;
-    private DrawerLayout drawer_layout;
+    List<String> xDataList = new ArrayList<>();// x轴数据源
+    List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -64,8 +62,13 @@ public class Main2Activity extends AppCompatActivity
             super.handleMessage(msg);
             switch (msg.what) {
                 case 0:
-                    Toast.makeText(Main2Activity.this, msg.obj + "", Toast.LENGTH_SHORT).show();
-                    UsbUtils.sendToUsb(UsbUtils.hexToByteArray("094F657002000000"));
+//                    Toast.makeText(Main2Activity.this, msg.obj + "", Toast.LENGTH_SHORT).show();
+                    UsbUtils.sendToUsb(CLOSE_PORT);
+                    for (int i = 0; i < results.length; i += 2) {
+                        xDataList.add(String.valueOf(i / 2));
+                        yDataList.add(new Entry(i / 2, UsbUtils.twoByteToUnsignedInt(results[i], results[i + 1])));
+                    }
+                    ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
                     break;
                 case 1:
                     Toast.makeText(Main2Activity.this, "请输入合理范围内的时间", Toast.LENGTH_SHORT).show();
@@ -98,10 +101,7 @@ public class Main2Activity extends AppCompatActivity
     private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-//            tvInfo.append("BroadcastReceiver in\n");
-
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                Toast.makeText(Main2Activity.this, "USB设备已连接！", Toast.LENGTH_SHORT).show();
                 LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this);
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
                 Toast.makeText(Main2Activity.this, "USB设备已移除！", Toast.LENGTH_SHORT).show();
@@ -119,15 +119,6 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -246,7 +237,6 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
-//                canUseUsb = UsbUtils.initUsbData(this);
                 if (LaManApplication.canUseUsb) {
                     final int[] count = {0};
                     final Timer timer = new Timer();
@@ -255,48 +245,26 @@ public class Main2Activity extends AppCompatActivity
                         public void run() {
                             switch (count[0]) {
                                 case 0:
-//                                    try {
-//                                        int time = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
-//                                        String s = Integer.toHexString(time * 1000);
-//                                        StringBuilder value = new StringBuilder("094F6974");
-//                                        for (int i = s.length() - 2; i >= -1; i -= 2) {
-//                                            if (i == -1) {
-//                                                value.append("0").append(s);
-//                                                break;
-//                                            }
-//                                            value.append(s.substring(i));
-//                                            s = s.substring(0, i);
-//
-//                                        }
-//                                        if (value.length() < 16) {
-//
-//                                            value.append(UsbUtils.repeat(16 - value.length(), "0"));
-//                                        }
-//                                        Log.e("data",value.toString());
-//                                        UsbUtils.sendToUsb(UsbUtils.hexToByteArray(value.toString()));
-//                                    } catch (NumberFormatException e) {
-//                                        handler.sendEmptyMessage(1);
-//
-//                                    }
-                                    UsbUtils.sendToUsb(UsbUtils.hexToByteArray("094F697420A10700"));
-
+                                    try {
+                                        int time = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
+                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
+                                    } catch (NumberFormatException e) {
+                                        handler.sendEmptyMessage(1);
+                                    }
                                     break;
                                 case 1:
-                                    UsbUtils.sendToUsb(UsbUtils.hexToByteArray("094F707700000000E803000042000000"));
+                                    UsbUtils.sendToUsb(SET_POWER);
                                     break;
                                 case 2:
-                                    UsbUtils.sendToUsb(UsbUtils.hexToByteArray("094F657002000000"));
+                                    UsbUtils.sendToUsb(OPEN_PORT);
+
                                     break;
                                 case 3:
-                                    UsbUtils.sendToUsb(UsbUtils.hexToByteArray("094F534F"), true);
+                                    UsbUtils.sendToUsb(GET_DATA, true);
                                     break;
                                 case 4:
-                                    byte[] bytes = readFromUsb();
-                                    Message message = new Message();
-                                    message.what = 0;
-                                    message.obj = UsbUtils.bytesToHexString(bytes != null ? bytes : new byte[0]);
-                                    Log.e("data", UsbUtils.bytesToHexString(bytes != null ? bytes : new byte[0]));
-                                    handler.sendMessage(message);
+                                    results = readFromUsb();
+                                    handler.sendEmptyMessage(0);
                                     break;
                                 case 5:
                                     timer.cancel();
@@ -307,7 +275,7 @@ public class Main2Activity extends AppCompatActivity
 
                         }
                     };
-                    timer.schedule(timerTask, 500, 500);
+                    timer.schedule(timerTask, 50, 50);
 
                 } else {
                     Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
@@ -325,19 +293,19 @@ public class Main2Activity extends AppCompatActivity
                         count[0]++;
                         switch (count[0]) {
                             case 1:
-                                UsbUtils.sendToUsb(Z5_setIntTime);
+                                UsbUtils.sendToUsb(SET_INIT_TIME);
 
                                 break;
                             case 2:
-                                UsbUtils.sendToUsb(Z5_setPWM);
+                                UsbUtils.sendToUsb(SET_POWER);
 
                                 break;
                             case 3:
-                                UsbUtils.sendToUsb(Z5_setExternalPort);
+                                UsbUtils.sendToUsb(OPEN_PORT);
 
                                 break;
                             case 4:
-                                UsbUtils.sendToUsb(Z5_spectrumOneShot);
+                                UsbUtils.sendToUsb(GET_DATA);
 
 
                                 break;
@@ -357,15 +325,18 @@ public class Main2Activity extends AppCompatActivity
 
                 break;
             case R.id.button_start2:
-                UsbUtils.sendToUsb(Z5_closePort);
+                if (LaManApplication.canUseUsb)
+                    UsbUtils.sendToUsb(CLOSE_PORT);
 
                 break;
             case R.id.button_start3:
-                UsbUtils.sendToUsb(Z5_setExternalPort);
+                if (LaManApplication.canUseUsb)
+                    UsbUtils.sendToUsb(OPEN_PORT);
 
                 break;
             case R.id.button_start4:
-                UsbUtils.sendToUsb(Z5_spectrumOneShot, true);
+                if (LaManApplication.canUseUsb)
+                    UsbUtils.sendToUsb(GET_DATA, true);
 
                 break;
         }

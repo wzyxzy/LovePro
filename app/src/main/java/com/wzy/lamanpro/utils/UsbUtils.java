@@ -46,22 +46,6 @@ public class UsbUtils {
     private static byte[] receiveytes;
     private static Context context;
 
-    private static Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-
-                    showTmsg("指令已经发送！ret为" + msg.arg1 + msg.obj);
-                    break;
-                case 1:
-                    showTmsg("收到数据：" + bytesToHexString((byte[]) msg.obj));
-                    break;
-            }
-        }
-    };
-
     public static boolean initUsbData(Context context) {
         UsbUtils.context = context;
 
@@ -87,30 +71,16 @@ public class UsbUtils {
             mInterface = usbInterface;
             break;
         }
-        // 设置端点
-        for (int i = 0; i < mInterface.getEndpointCount(); i++) {
-            //if (mInterface.getEndpoint(1) != null)
-            // 端点地址,最高位表示方向
-            if ((mInterface.getEndpoint(i).getAddress() & 0x80) == 0x00) {
-
-//                Log.e("usbEpOut", "EpOut = " + String.format("%02X ", usbEpOut.getAddress()) + "i=" + i);
-            } else {
-//                usbEpIn = mInterface.getEndpoint(i);
-//                Log.e("usbEpOut", "EpIn = " + String.format("%02X ", usbEpIn.getAddress()) + "i=" + i);
-            }
-            Log.e("usbEpOut", "getAddress = " + mInterface.getEndpoint(i).getAddress() + ",getDirection = " + mInterface.getEndpoint(i).getDirection() + ",getAttributes = " + mInterface.getEndpoint(i).getAttributes() + ",getEndpointNumber = " + mInterface.getEndpoint(i).getEndpointNumber() + ",getInterval = " + mInterface.getEndpoint(i).getInterval() + ",getMaxPacketSize = " + mInterface.getEndpoint(i).getMaxPacketSize() + ",getType = " + mInterface.getEndpoint(i).getType());
-        }
-        usbEpOut = mInterface.getEndpoint(3);
-        usbEpIn = mInterface.getEndpoint(2);
         //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
-//        if (mInterface.getEndpoint(1) != null) {
-//            usbEpOut = mInterface.getEndpoint(1);
-//        }
-//        if (mInterface.getEndpoint(1) != null) {
-//            usbEpIn = mInterface.getEndpoint(1);
-//        }
+        if (mInterface.getEndpoint(3) != null) {
+            usbEpOut = mInterface.getEndpoint(3);
+        }
+        if (mInterface.getEndpoint(2) != null) {
+            usbEpIn = mInterface.getEndpoint(2);
+        }
         if (mInterface != null) {
             // 判断是否有权限
+            UsbPermissionReceiver usbPermissionReceiver = new UsbPermissionReceiver();
             if (manager.hasPermission(mUsbDevice)) {
                 // 打开设备，获取 UsbDeviceConnection 对象，连接设备，用于后面的通讯
                 mDeviceConnection = manager.openDevice(mUsbDevice);
@@ -118,7 +88,8 @@ public class UsbUtils {
                     return false;
                 }
                 if (mDeviceConnection.claimInterface(mInterface, true)) {
-                    showTmsg("找到设备接口");
+                    showTmsg("USB连接成功！");
+                    context.unregisterReceiver(usbPermissionReceiver);
                     return true;
 
                 } else {
@@ -126,7 +97,7 @@ public class UsbUtils {
                     return false;
                 }
             } else {
-                UsbPermissionReceiver usbPermissionReceiver = new UsbPermissionReceiver();
+
                 Intent intent = new Intent(ACTION_DEVICE_PERMISSION);
                 PendingIntent mPermissionIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
                 IntentFilter permissionFilter = new IntentFilter(ACTION_DEVICE_PERMISSION);
@@ -153,13 +124,12 @@ public class UsbUtils {
                     if (device.getDeviceName().equals(mUsbDevice.getDeviceName())) {
                         if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                             //授权成功,在这里进行打开设备操作
-                            showTmsg("已授权！");
                             LaManApplication.canUseUsb = true;
                             //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
                             initUsbData(context);
-//                            context.unregisterReceiver();
+
                         } else {
-                            showTmsg("授权失败！");
+                            showTmsg("USB授权失败！");
                             //授权失败
                             LaManApplication.canUseUsb = false;
                         }
@@ -169,66 +139,33 @@ public class UsbUtils {
         }
     }
 
-    public static void sendToUsb(byte[] content) {
-        sendToUsb(content, false);
+    public static byte[] sendToUsb(byte[] content) {
+        return sendToUsb(content, false);
     }
 
-    public static void sendToUsb(byte[] content, boolean isLast) {
+    public static byte[] sendToUsb(byte[] content, boolean isLast) {
         sendbytes = content;
-        int ret = -1;
-        // 发送准备命令
-        ret = mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 5000);
-//        showTmsg("指令已经发送！");
-
-        Message message1 = new Message();
-        message1.what = 0;
-        message1.arg1 = ret;
-        message1.obj = bytesToHexString(content);
-        handler.sendMessage(message1);
+        mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 5000);
         if (isLast) {
             // 接收发送成功信息(相当于读取设备数据)
             receiveytes = new byte[8192];   //根据设备实际情况写数据大小
-            ret = mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 10000);
-            Log.e("receive", bytesToHexString(receiveytes));
-            Message message2 = new Message();
-            message2.what = 0;
-            message2.arg1 = ret;
-            message2.obj = bytesToHexString(receiveytes);
-            handler.sendMessage(message2);
+            mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 10000);
+            return receiveytes;
         }
-
-//        Message message = new Message();
-//        message.what = 0;
-//        message.arg1 = ret;
-//        message.obj = bytesToHexString(receiveytes);
-//        handler.sendMessage(message);
-//        message.what = 0;
-//        message.arg1 = ret;
-//        handler.sendMessage(message);
-//        result_tv.setText(String.valueOf(ret));
-//        Toast.makeText(context, String.valueOf(ret), Toast.LENGTH_SHORT).show();
+        return null;
     }
 
     public static byte[] readFromUsb() {
-//        //读取数据2
-//        int inMax = usbEpIn.getMaxPacketSize();
         ByteBuffer byteBuffer = ByteBuffer.allocate(8192);
         UsbRequest usbRequest = new UsbRequest();
         usbRequest.initialize(mDeviceConnection, usbEpIn);
         usbRequest.queue(byteBuffer, 8192);
         if (mDeviceConnection.requestWait() == usbRequest) {
-            byte[] retData = byteBuffer.array();
-            Log.e("receive",bytesToHexString(retData));
-            Message message = new Message();
-            message.what = 1;
-            message.obj = retData;
-            handler.sendMessage(message);
-            return retData;
+            return byteBuffer.array();
         }
         return null;
 
     }
-
 
 
     private static void showTmsg(String msg) {
@@ -293,5 +230,93 @@ public class UsbUtils {
         return sb.toString();
     }
 
+    /**
+     * 将int转为低字节在前，高字节在后的byte数组
+     */
+    public static byte[] intTobyteLH(int n) {
+        byte[] b = new byte[4];// 为什么是4？因为java中int占4个字节，一个字节占8位，总共32位
+        b[0] = (byte) (n & 0xff);      // 从右到左，取第1到第8位
+        b[1] = (byte) (n >> 8 & 0xff); // 从右到左,取第9到16位
+        b[2] = (byte) (n >> 16 & 0xff);// 从右到左,取第17到24位
+        b[3] = (byte) (n >> 24 & 0xff);// 从右到左,取第25到32位
+        return b;
+    }
 
+    /**
+     * 将int转为低字节在前，高字节在后的byte数组
+     */
+    public static byte[] intTobyteHH(int n) {
+        byte[] b = new byte[4];
+        b[3] = (byte) (n & 0xff);
+        b[2] = (byte) (n >> 8 & 0xff);
+        b[1] = (byte) (n >> 16 & 0xff);
+        b[0] = (byte) (n >> 24 & 0xff);
+        return b;
+    }
+
+    /**
+     *  
+     *  *  
+     *  * @param data1 
+     *  * @param data2 
+     *  * @return data1 与 data2拼接的结果 
+     *  
+     */
+    public static byte[] addBytes(byte[] data1, byte[] data2) {
+        byte[] data3 = new byte[data1.length + data2.length];
+        System.arraycopy(data1, 0, data3, 0, data1.length);
+        System.arraycopy(data2, 0, data3, data1.length, data2.length);
+        return data3;
+
+    }
+
+    /**
+     * byte数组中取int数值，本方法适用于(低位在前，高位在后)的顺序，和和intToBytes（）配套使用
+     *
+     * @param src    byte数组
+     * @param offset 从数组的第offset位开始
+     * @return int数值
+     */
+    public static int bytesToInt(byte[] src, int offset) {
+        int value;
+        value = (int) ((src[offset] & 0xFF)
+                | ((src[offset + 1] & 0xFF) << 8)
+                | ((src[offset + 2] & 0xFF) << 16)
+                | ((src[offset + 3] & 0xFF) << 24));
+        return value;
+    }
+
+    /**
+     * byte数组中取int数值，本方法适用于(低位在后，高位在前)的顺序。和intToBytes2（）配套使用
+     */
+    public static int bytesToInt2(byte[] src, int offset) {
+        int value;
+        value = (int) (((src[offset] & 0xFF) << 24)
+                | ((src[offset + 1] & 0xFF) << 16)
+                | ((src[offset + 2] & 0xFF) << 8)
+                | (src[offset + 3] & 0xFF));
+        return value;
+    }
+
+    /**
+     * 将两个byte数据转化为有符号int
+     *
+     * @param high : 高八位
+     * @param low  : 低八位
+     * @return
+     */
+    public static int twoByteToSignedInt(byte high, byte low) {
+        return (high << 8) | low;
+    }
+
+    /**
+     * 将两个byte数据转化为无符号int
+     *
+     * @param high : 高八位
+     * @param low  : 低八位
+     * @return
+     */
+    public static int twoByteToUnsignedInt(byte high, byte low) {
+        return ((high << 8) & 0xffff) | (low & 0x00ff);
+    }
 }
