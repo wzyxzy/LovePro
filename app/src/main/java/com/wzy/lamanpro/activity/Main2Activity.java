@@ -9,14 +9,12 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +41,6 @@ import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
-
     private static final byte[] SET_INIT_TIME = {0x09, 0x4F, 0x69, 0x74};//设置积分时间
     private static final byte[] SET_POWER = {0x09, 0x4F, 0x70, 0x77, 0x00, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03, 0x00, 0x00, 0x42, 0x00, 0x00, 0x00};//设置能量大小
     private static final byte[] OPEN_PORT = {0x09, 0x4f, 0x65, 0x70, 0x02, 0x00, 0x00, 0x00};//打开激光
@@ -74,7 +71,6 @@ public class Main2Activity extends AppCompatActivity
                     Toast.makeText(Main2Activity.this, "请输入合理范围内的时间", Toast.LENGTH_SHORT).show();
                     break;
             }
-
         }
     };
     private Button button_start1;
@@ -89,7 +85,6 @@ public class Main2Activity extends AppCompatActivity
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(mUsbReceiver, usbFilter);
-
     }
 
     @Override
@@ -119,18 +114,15 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         TextView textView = (TextView) headerView.findViewById(R.id.textView);
-
         textView.setText(new UserDaoUtils(this).queryUserName(SPUtility.getUserId(this)));
     }
 
@@ -157,17 +149,13 @@ public class Main2Activity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         switch (id) {
             case R.id.action_settings:
                 startActivity(new Intent(Main2Activity.this, SettingTest.class));
                 return true;
             case R.id.action_report:
-
                 break;
-
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -191,9 +179,7 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_logout:
                 showStyleDialog();
                 break;
-
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -201,7 +187,6 @@ public class Main2Activity extends AppCompatActivity
 
 
     private void showStyleDialog() {
-
         CommonDialog commonDialog = new CommonDialog(this);
         commonDialog.setTitle("温 馨 提 示 :");
         commonDialog.setMessage("您确定注销吗？");
@@ -216,7 +201,6 @@ public class Main2Activity extends AppCompatActivity
         });
         commonDialog.show();
     }
-
 
     private void initView() {
         lineChart = findViewById(R.id.lineChart);
@@ -269,75 +253,60 @@ public class Main2Activity extends AppCompatActivity
                                 case 5:
                                     timer.cancel();
                                     break;
-
                             }
                             count[0]++;
-
                         }
                     };
                     timer.schedule(timerTask, 50, 50);
-
                 } else {
                     Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
             case R.id.button_start1:
+                if (!LaManApplication.canUseUsb)
+                    return;
                 final Timer timer1 = new Timer();
                 final int[] count = {0};
-
                 TimerTask timerTask1 = new TimerTask() {
                     @Override
                     public void run() {
-
                         count[0]++;
                         switch (count[0]) {
                             case 1:
                                 UsbUtils.sendToUsb(SET_INIT_TIME);
-
                                 break;
                             case 2:
                                 UsbUtils.sendToUsb(SET_POWER);
-
                                 break;
                             case 3:
                                 UsbUtils.sendToUsb(OPEN_PORT);
-
                                 break;
                             case 4:
                                 UsbUtils.sendToUsb(GET_DATA);
-
-
                                 break;
                             case 5:
                                 UsbUtils.readFromUsb();
                                 break;
-
-
                         }
                         if (count[0] == 5) {
                             timer1.cancel();
                         }
-
                     }
                 };
                 timer1.schedule(timerTask1, 50, 50);
-
                 break;
             case R.id.button_start2:
                 if (LaManApplication.canUseUsb)
                     UsbUtils.sendToUsb(CLOSE_PORT);
-
                 break;
             case R.id.button_start3:
                 if (LaManApplication.canUseUsb)
                     UsbUtils.sendToUsb(OPEN_PORT);
-
                 break;
             case R.id.button_start4:
                 if (LaManApplication.canUseUsb)
                     UsbUtils.sendToUsb(GET_DATA, true);
-
                 break;
         }
     }
