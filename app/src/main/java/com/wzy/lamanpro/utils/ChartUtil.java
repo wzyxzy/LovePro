@@ -90,6 +90,7 @@ public class ChartUtil {
         XAxis xAxis = lineChart.getXAxis();
         // 显示X轴上的刻度值
         xAxis.setDrawLabels(true);
+
         // 设置X轴的数据显示在报表的下方
         xAxis.setPosition(XAxisPosition.BOTTOM);
         // 轴线
@@ -97,11 +98,11 @@ public class ChartUtil {
         // 设置不从X轴发出纵向直线
         xAxis.setDrawGridLines(false);
         YAxis yAxis = lineChart.getAxisLeft();
-        yAxis.setAxisMaxValue(600);
-        yAxis.setAxisMinValue(100);
+        yAxis.setAxisMaxValue(60000);
+        yAxis.setAxisMinValue(0);
         // 执行的动画,x轴（动画持续时间）
         lineChart.animateX(2500);
-        // lineChart.notifyDataSetChanged();
+        lineChart.notifyDataSetChanged();
     }
 
     /**
@@ -135,9 +136,9 @@ public class ChartUtil {
         // 定位线
         lineDataSet.setHighlightEnabled(true);
         // 线宽
-        lineDataSet.setLineWidth(2.0f);
+        lineDataSet.setLineWidth(1f);
         // 显示的圆形大小
-        lineDataSet.setCircleSize(4f);
+        lineDataSet.setCircleSize(1f);
         // 显示颜色
 //        lineDataSet.setColor(context.getApplicationContext().getResources().getColor(R.color.bg_blue));
         // 圆形的颜色
@@ -157,7 +158,7 @@ public class ChartUtil {
         lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         // 设置每条曲线图例标签名
         // lineDataSet.setLabel("标签");
-        lineDataSet.setValueTextSize(14f);
+        lineDataSet.setValueTextSize(10f);
         // 曲线弧度（区间0.05f-1f，默认0.2f）
 //        lineDataSet.setCubicIntensity(0.2f);
         // 设置为曲线显示,false为折线
@@ -167,7 +168,6 @@ public class ChartUtil {
         LineData lineData = new LineData(xDataList, lineDataSets);
         return lineData;
     }
-
 
 
 }

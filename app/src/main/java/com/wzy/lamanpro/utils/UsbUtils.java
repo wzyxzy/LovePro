@@ -89,7 +89,7 @@ public class UsbUtils {
                 }
                 if (mDeviceConnection.claimInterface(mInterface, true)) {
                     showTmsg("USB连接成功！");
-                    context.unregisterReceiver(usbPermissionReceiver);
+
                     return true;
 
                 } else {
@@ -148,7 +148,7 @@ public class UsbUtils {
         mDeviceConnection.bulkTransfer(usbEpOut, sendbytes, sendbytes.length, 5000);
         if (isLast) {
             // 接收发送成功信息(相当于读取设备数据)
-            receiveytes = new byte[8192];   //根据设备实际情况写数据大小
+            receiveytes = new byte[4200];   //根据设备实际情况写数据大小
             mDeviceConnection.bulkTransfer(usbEpIn, receiveytes, receiveytes.length, 10000);
             return receiveytes;
         }
@@ -156,10 +156,10 @@ public class UsbUtils {
     }
 
     public static byte[] readFromUsb() {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(8192);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4200);
         UsbRequest usbRequest = new UsbRequest();
         usbRequest.initialize(mDeviceConnection, usbEpIn);
-        usbRequest.queue(byteBuffer, 8192);
+        usbRequest.queue(byteBuffer, 4200);
         if (mDeviceConnection.requestWait() == usbRequest) {
             return byteBuffer.array();
         }
@@ -168,7 +168,7 @@ public class UsbUtils {
     }
 
 
-    private static void showTmsg(String msg) {
+    public static void showTmsg(String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
