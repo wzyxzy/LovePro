@@ -108,4 +108,13 @@ public class UserDaoUtils {
         qb.where(UsersDao.Properties.Account.eq(account));
         return qb.list().size();
     }
+
+    /**
+     * 查询用户个数
+     */
+    public Users queryUser(String account) {
+        QueryBuilder<Users> qb = usersDao.queryBuilder();
+        qb.where(UsersDao.Properties.Account.eq(account));
+        return qb.list().get(0);
+    }
 }

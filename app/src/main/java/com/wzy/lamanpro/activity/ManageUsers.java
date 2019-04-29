@@ -1,5 +1,6 @@
 package com.wzy.lamanpro.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,7 +21,7 @@ import java.util.List;
 
 public class ManageUsers extends AppCompatActivity implements View.OnClickListener {
 
-//    private Toolbar toolbar;
+    //    private Toolbar toolbar;
     private ListView userList;
     private FloatingActionButton fab;
     private List<Users> users;
@@ -38,6 +40,14 @@ public class ManageUsers extends AppCompatActivity implements View.OnClickListen
         users = new UserDaoUtils(this).queryAllUsers();
         userAdapter = new UserAdapter(users, this, R.layout.item_users);
         userList.setAdapter(userAdapter);
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ManageUsers.this, UserDetails.class);
+                intent.putExtra("account", users.get(position).getAccount());
+                startActivity(intent);
+            }
+        });
 
     }
 
