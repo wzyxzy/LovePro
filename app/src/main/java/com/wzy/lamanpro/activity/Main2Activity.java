@@ -3,9 +3,11 @@ package com.wzy.lamanpro.activity;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +15,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
@@ -201,20 +204,43 @@ public class Main2Activity extends AppCompatActivity
     }
 
 
-    private void showStyleDialog() {
-        CommonDialog commonDialog = new CommonDialog(this);
-        commonDialog.setTitle("温 馨 提 示 :");
-        commonDialog.setMessage("您确定注销吗？");
-        commonDialog.setRightButtonClickListener(new CommonDialog.RightButtonClickListener() {
+//    private void showStyleDialog() {
+//
+//        CommonDialog commonDialog = new CommonDialog(this);
+//        commonDialog.setTitle("温 馨 提 示 :");
+//        commonDialog.setMessage("您确定注销吗？");
+//        commonDialog.setRightButtonClickListener(new CommonDialog.RightButtonClickListener() {
+//            @Override
+//            public void onRightButtonClick() {
+//                SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
+//                finish();
+//                Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//        commonDialog.show();
+//    }
+
+    protected void showStyleDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("您确定注销吗？");
+        builder.setTitle("温 馨 提 示 :");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
-            public void onRightButtonClick() {
+            public void onClick(DialogInterface dialog, int which) {
                 SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
                 finish();
                 Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
-        commonDialog.show();
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     private void initView() {
