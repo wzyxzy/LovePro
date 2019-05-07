@@ -61,7 +61,7 @@ public class LoginActivity extends CommonActivity {
     private void initData() {
         UserDaoUtils userDaoUtils = new UserDaoUtils(this);
         if (userDaoUtils.queryUserSize("admin") == 0) {
-            userDaoUtils.insertUserList(new Users("0001", "admin", "admin", "admin", "admin@laman.com"));
+            userDaoUtils.insertUserList(new Users("0001", "admin", "admin", "admin", "admin@laman.com", 1));
         }
         if (SPUtility.getSPBoolean(LoginActivity.this, "isAutoLogin")) {
             mAuthTask = new UserLoginTask(SPUtility.getUserId(this), SPUtility.getSPString(this, "password"));

@@ -26,7 +26,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
-        <activity android:name=".activity.UserDetails"></activity>
+        <activity android:name=".activity.UserDetails"
+            android:label="@string/title_activity_manage_users"
+            android:parentActivityName=".activity.ManageUsers">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.wzy.lamanpro.activity.ManageUsers" />
+        </activity>
         <activity
             android:name=".activity.ManageUsers"
             android:label="@string/title_activity_manage_users"

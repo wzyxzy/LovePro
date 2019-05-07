@@ -117,4 +117,12 @@ public class UserDaoUtils {
         qb.where(UsersDao.Properties.Account.eq(account));
         return qb.list().get(0);
     }
+
+    /**
+     * 查询用户个数
+     */
+    public void deleteUser(String account) {
+        QueryBuilder<Users> qb = usersDao.queryBuilder();
+        qb.where(UsersDao.Properties.Account.eq(account)).buildDelete().executeDeleteWithoutDetachingEntities();
+    }
 }

@@ -1,17 +1,22 @@
 package com.wzy.lamanpro.activity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.bean.Users;
 import com.wzy.lamanpro.dao.UserDaoUtils;
+import com.wzy.lamanpro.utils.SPUtility;
 
 public class UserDetails extends AppCompatActivity implements View.OnClickListener {
 
@@ -20,12 +25,13 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
     private EditText name_text;
     private EditText password;
     private EditText email;
-    private EditText pemission_level;
+    private Switch pemission_level;
     private Button change;
     private Button delete;
     private String account_;
     private Users users;
     private EditText account;
+    private boolean canEdit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +50,7 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         password.setText(users.getPassword());
         email.setText(users.getEmail());
         account.setText(users.getAccount());
-
+        pemission_level.setChecked(users.getLevel() == 1);
     }
 
     private void initView() {
@@ -53,13 +59,28 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         name_text = (EditText) findViewById(R.id.name_text);
         password = (EditText) findViewById(R.id.password);
         email = (EditText) findViewById(R.id.email);
-        pemission_level = (EditText) findViewById(R.id.pemission_level);
+        pemission_level = (Switch) findViewById(R.id.pemission_level);
         change = (Button) findViewById(R.id.change);
         delete = (Button) findViewById(R.id.delete);
 
         change.setOnClickListener(this);
         delete.setOnClickListener(this);
         account = (EditText) findViewById(R.id.account);
+        if (canEdit) {
+            id_num.setEnabled(true);
+            name_text.setEnabled(true);
+            password.setEnabled(true);
+            account.setEnabled(true);
+            email.setEnabled(true);
+            pemission_level.setEnabled(true);
+        } else {
+            id_num.setEnabled(false);
+            name_text.setEnabled(false);
+            password.setEnabled(false);
+            account.setEnabled(false);
+            email.setEnabled(false);
+            pemission_level.setEnabled(false);
+        }
     }
 
     @Override
@@ -69,7 +90,27 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
 
                 break;
             case R.id.delete:
-
+                if (users.getLevel() == 1) {
+                    Toast.makeText(this, "改账户为管理员账户，不可删除！", Toast.LENGTH_SHORT).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("您确定要删除改账户吗？");
+                    builder.setTitle("特别提示");
+                    builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            new UserDaoUtils(UserDetails.this).deleteUser(account_);
+                            finish();
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.create().show();
+                }
                 break;
         }
     }
@@ -100,11 +141,11 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
             return;
         }
 
-        String level = pemission_level.getText().toString().trim();
-        if (TextUtils.isEmpty(level)) {
-            Toast.makeText(this, "level不能为空", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        String level = pemission_level.getText().toString().trim();
+//        if (TextUtils.isEmpty(level)) {
+//            Toast.makeText(this, "level不能为空", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
         // validate
         String accountString = account.getText().toString().trim();
         if (TextUtils.isEmpty(accountString)) {

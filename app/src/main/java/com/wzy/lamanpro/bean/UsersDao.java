@@ -27,6 +27,7 @@ public class UsersDao extends AbstractDao<Users, String> {
         public final static Property Account = new Property(2, String.class, "account", false, "ACCOUNT");
         public final static Property Password = new Property(3, String.class, "password", false, "PASSWORD");
         public final static Property Email = new Property(4, String.class, "email", false, "EMAIL");
+        public final static Property Level = new Property(5, int.class, "level", false, "LEVEL");
     }
 
 
@@ -46,7 +47,8 @@ public class UsersDao extends AbstractDao<Users, String> {
                 "\"NAME\" TEXT," + // 1: name
                 "\"ACCOUNT\" TEXT," + // 2: account
                 "\"PASSWORD\" TEXT," + // 3: password
-                "\"EMAIL\" TEXT);"); // 4: email
+                "\"EMAIL\" TEXT," + // 4: email
+                "\"LEVEL\" INTEGER NOT NULL );"); // 5: level
     }
 
     /** Drops the underlying database table. */
@@ -83,6 +85,7 @@ public class UsersDao extends AbstractDao<Users, String> {
         if (email != null) {
             stmt.bindString(5, email);
         }
+        stmt.bindLong(6, entity.getLevel());
     }
 
     @Override
@@ -113,6 +116,7 @@ public class UsersDao extends AbstractDao<Users, String> {
         if (email != null) {
             stmt.bindString(5, email);
         }
+        stmt.bindLong(6, entity.getLevel());
     }
 
     @Override
@@ -127,7 +131,8 @@ public class UsersDao extends AbstractDao<Users, String> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // account
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // password
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // email
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // email
+            cursor.getInt(offset + 5) // level
         );
         return entity;
     }
@@ -139,6 +144,7 @@ public class UsersDao extends AbstractDao<Users, String> {
         entity.setAccount(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setPassword(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setEmail(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setLevel(cursor.getInt(offset + 5));
      }
     
     @Override

@@ -12,58 +12,56 @@ public class Users {
     private String account;
     private String password;
     private String email;
-
-    @Generated(hash = 1168930687)
+    private int level;
+    @Generated(hash = 116081921)
     public Users(String id, String name, String account, String password,
-            String email) {
+            String email, int level) {
         this.id = id;
         this.name = name;
         this.account = account;
         this.password = password;
         this.email = email;
+        this.level = level;
     }
-
     @Generated(hash = 2146996206)
     public Users() {
     }
-
     public String getId() {
-        return id;
+        return this.id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
-
     public String getName() {
-        return name;
+        return this.name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getAccount() {
-        return account;
+        return this.account;
     }
-
     public void setAccount(String account) {
         this.account = account;
     }
-
     public String getPassword() {
-        return password;
+        return this.password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
     public String getEmail() {
-        return email;
+        return this.email;
     }
-
     public void setEmail(String email) {
         this.email = email;
     }
+    public int getLevel() {
+        return this.level;
+    }
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    
 }

@@ -57,7 +57,7 @@
     <TextView
         android:id="@+id/permission_title"
         style="@style/list_left_text"
-        android:text="权限级别"
+        android:text="是否为管理员"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email_title" />
 
@@ -95,10 +95,12 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 
-    <EditText
+    <Switch
         android:id="@+id/pemission_level"
-        style="@style/list_right_text"
-        android:inputType="numberDecimal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="50dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email" />
 
