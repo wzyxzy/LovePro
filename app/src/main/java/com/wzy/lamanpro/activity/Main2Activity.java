@@ -260,6 +260,17 @@ public class Main2Activity extends AppCompatActivity
         toolbar.setOnClickListener(this);
         state = (TextView) findViewById(R.id.state);
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("请注意：不要对可疑对燃点物质扫描！！！\n请注意：执行扫描时请勿对着眼睛！！！");
+        builder.setTitle("温 馨 提 示 :");
+//        builder.set
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     @Override
