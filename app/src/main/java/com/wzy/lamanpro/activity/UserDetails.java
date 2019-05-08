@@ -62,7 +62,6 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         pemission_level = (Switch) findViewById(R.id.pemission_level);
         change = (Button) findViewById(R.id.change);
         delete = (Button) findViewById(R.id.delete);
-
         change.setOnClickListener(this);
         delete.setOnClickListener(this);
         account = (EditText) findViewById(R.id.account);
