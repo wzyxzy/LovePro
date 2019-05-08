@@ -49,19 +49,15 @@ public class LoginActivity extends CommonActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         initView();
         initData();
-
         // Set up the login form.
-
-
     }
 
     private void initData() {
         UserDaoUtils userDaoUtils = new UserDaoUtils(this);
         if (userDaoUtils.queryUserSize("admin") == 0) {
-            userDaoUtils.insertUserList(new Users("0001", "admin", "admin", "admin", "admin@laman.com", 1));
+            userDaoUtils.insertUserList(new Users((long) 1, "admin", "admin", "admin", "admin@laman.com", 1));
         }
         if (SPUtility.getSPBoolean(LoginActivity.this, "isAutoLogin")) {
             mAuthTask = new UserLoginTask(SPUtility.getUserId(this), SPUtility.getSPString(this, "password"));
@@ -216,13 +212,6 @@ public class LoginActivity extends CommonActivity {
         @Override
         protected Integer doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-
-//            try {
-//                // Simulate network access.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
 
             if (userDaoUtils.queryUserSize(mAccount) == 0) {
                 return -1;

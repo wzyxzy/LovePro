@@ -6,15 +6,15 @@ import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class Users {
-    @Id
-    private String id;
+    @Id(autoincrement = true)
+    private Long id;
     private String name;
     private String account;
     private String password;
     private String email;
     private int level;
-    @Generated(hash = 116081921)
-    public Users(String id, String name, String account, String password,
+    @Generated(hash = 701311157)
+    public Users(Long id, String name, String account, String password,
             String email, int level) {
         this.id = id;
         this.name = name;
@@ -26,10 +26,10 @@ public class Users {
     @Generated(hash = 2146996206)
     public Users() {
     }
-    public String getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getName() {
@@ -62,6 +62,7 @@ public class Users {
     public void setLevel(int level) {
         this.level = level;
     }
+
 
     
 }

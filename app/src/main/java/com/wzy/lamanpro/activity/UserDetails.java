@@ -1,11 +1,11 @@
 package com.wzy.lamanpro.activity;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +16,10 @@ import android.widget.Toast;
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.bean.Users;
 import com.wzy.lamanpro.dao.UserDaoUtils;
-import com.wzy.lamanpro.utils.SPUtility;
 
 public class UserDetails extends AppCompatActivity implements View.OnClickListener {
 
     private TextView nameText;
-    private EditText id_num;
     private EditText name_text;
     private EditText password;
     private EditText email;
@@ -43,19 +41,28 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
 
     private void initData() {
         account_ = getIntent().getStringExtra("account");
-        users = new UserDaoUtils(this).queryUser(account_);
-        nameText.setText(account_);
-        id_num.setText(users.getId());
-        name_text.setText(users.getName());
-        password.setText(users.getPassword());
-        email.setText(users.getEmail());
-        account.setText(users.getAccount());
-        pemission_level.setChecked(users.getLevel() == 1);
+        if (TextUtils.isEmpty(account_)) {
+            canEdit = true;
+            name_text.setEnabled(true);
+            password.setEnabled(true);
+            account.setEnabled(true);
+            email.setEnabled(true);
+            pemission_level.setEnabled(true);
+            users = new Users();
+        } else {
+            users = new UserDaoUtils(this).queryUser(account_);
+            nameText.setText(account_);
+            name_text.setText(users.getName());
+            password.setText(users.getPassword());
+            email.setText(users.getEmail());
+            account.setText(users.getAccount());
+            pemission_level.setChecked(users.getLevel() == 1);
+        }
+
     }
 
     private void initView() {
         nameText = (TextView) findViewById(R.id.nameText);
-        id_num = (EditText) findViewById(R.id.id_num);
         name_text = (EditText) findViewById(R.id.name_text);
         password = (EditText) findViewById(R.id.password);
         email = (EditText) findViewById(R.id.email);
@@ -66,14 +73,12 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         delete.setOnClickListener(this);
         account = (EditText) findViewById(R.id.account);
         if (canEdit) {
-            id_num.setEnabled(true);
             name_text.setEnabled(true);
             password.setEnabled(true);
             account.setEnabled(true);
             email.setEnabled(true);
             pemission_level.setEnabled(true);
         } else {
-            id_num.setEnabled(false);
             name_text.setEnabled(false);
             password.setEnabled(false);
             account.setEnabled(false);
@@ -86,11 +91,16 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.change:
-
+                canEdit = true;
+                name_text.setEnabled(true);
+                password.setEnabled(true);
+                account.setEnabled(true);
+                email.setEnabled(true);
+                pemission_level.setEnabled(true);
                 break;
             case R.id.delete:
                 if (users.getLevel() == 1) {
-                    Toast.makeText(this, "改账户为管理员账户，不可删除！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "该账户为管理员账户，不可删除！", Toast.LENGTH_SHORT).show();
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("您确定要删除改账户吗？");
@@ -114,30 +124,62 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    private void submit() {
-        // validate
-        String num = id_num.getText().toString().trim();
-        if (TextUtils.isEmpty(num)) {
-            Toast.makeText(this, "num不能为空", Toast.LENGTH_SHORT).show();
-            return;
+    @Override
+    public void onBackPressed() {
+        if (canEdit) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("您要保存修改的数据吗？");
+            builder.setTitle("特别提示");
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (submit() && users != null) {
+                        if (TextUtils.isEmpty(account_)) {
+                            new UserDaoUtils(UserDetails.this).insertUserList(users);
+                            finish();
+                        } else {
+                            new UserDaoUtils(UserDetails.this).updateUser(users);
+                            finish();
+                        }
+                    }
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+            builder.create().show();
+        } else {
+            super.onBackPressed();
         }
+    }
 
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        return super.onKeyDown(keyCode, event);
+//
+//    }
+
+    private boolean submit() {
         String text = name_text.getText().toString().trim();
         if (TextUtils.isEmpty(text)) {
-            Toast.makeText(this, "text不能为空", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "名字不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         String passwordString = password.getText().toString().trim();
         if (TextUtils.isEmpty(passwordString)) {
-            Toast.makeText(this, "passwordString不能为空", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         String emailString = email.getText().toString().trim();
         if (TextUtils.isEmpty(emailString)) {
-            Toast.makeText(this, "emailString不能为空", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "email不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
 //        String level = pemission_level.getText().toString().trim();
@@ -148,12 +190,20 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         // validate
         String accountString = account.getText().toString().trim();
         if (TextUtils.isEmpty(accountString)) {
-            Toast.makeText(this, "accountString不能为空", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "账号不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         // TODO validate success, do something
+        users.setAccount(accountString);
+        users.setEmail(emailString);
+        users.setLevel(pemission_level.isChecked() ? 1 : 0);
+        users.setName(text);
+        users.setPassword(passwordString);
+        return true;
 
+//        return new Users(num, text, accountString, passwordString,
+//                emailString, pemission_level.isChecked() ? 1 : 0);
 
     }
 

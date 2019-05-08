@@ -6,9 +6,10 @@ import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class ProductData {
-    @Id
-    private int id;//编号
+    @Id(autoincrement = true)
+    private Long id;//编号
     private String proName;//样品名称
+    private byte[] data;//数据
     private String userName;//用户名
     private String userCompany;//公司
     private String proHSCode;//HS码
@@ -22,15 +23,16 @@ public class ProductData {
     private String proRTECSNumber;//RTECS号
     private String proBRNNumber;//BRN号
     private String proDetail;//样品信息
-    @Generated(hash = 597339658)
-    public ProductData(int id, String proName, String userName, String userCompany,
-            String proHSCode, String proCASCode, String proNFPA704Code,
-            String proDangerLevel, String proDangerClass,
+    @Generated(hash = 508400606)
+    public ProductData(Long id, String proName, byte[] data, String userName,
+            String userCompany, String proHSCode, String proCASCode,
+            String proNFPA704Code, String proDangerLevel, String proDangerClass,
             String proDangerTransportCode, String proMDLNumber,
             String proEINECSNumber, String proRTECSNumber, String proBRNNumber,
             String proDetail) {
         this.id = id;
         this.proName = proName;
+        this.data = data;
         this.userName = userName;
         this.userCompany = userCompany;
         this.proHSCode = proHSCode;
@@ -48,10 +50,10 @@ public class ProductData {
     @Generated(hash = 1035286127)
     public ProductData() {
     }
-    public int getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public String getProName() {
@@ -59,6 +61,12 @@ public class ProductData {
     }
     public void setProName(String proName) {
         this.proName = proName;
+    }
+    public byte[] getData() {
+        return this.data;
+    }
+    public void setData(byte[] data) {
+        this.data = data;
     }
     public String getUserName() {
         return this.userName;
@@ -138,5 +146,6 @@ public class ProductData {
     public void setProDetail(String proDetail) {
         this.proDetail = proDetail;
     }
+
 
 }

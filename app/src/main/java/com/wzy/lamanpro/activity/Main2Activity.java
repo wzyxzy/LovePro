@@ -89,10 +89,7 @@ public class Main2Activity extends AppCompatActivity
             }
         }
     };
-    private Button button_start1;
-    private Button button_start2;
-    private Button button_start3;
-    private Button button_start4;
+
     private Toolbar toolbar;
     private TextView state;
 
@@ -185,6 +182,7 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_camera:
                 break;
             case R.id.nav_gallery:
+                startActivity(new Intent(Main2Activity.this, ManageData.class));
                 break;
             case R.id.nav_slideshow:
                 break;
@@ -248,14 +246,6 @@ public class Main2Activity extends AppCompatActivity
         button_start = findViewById(R.id.button_start);
         text_report = findViewById(R.id.text_report);
         button_start.setOnClickListener(this);
-        button_start1 = (Button) findViewById(R.id.button_start1);
-        button_start1.setOnClickListener(this);
-        button_start2 = (Button) findViewById(R.id.button_start2);
-        button_start2.setOnClickListener(this);
-        button_start3 = (Button) findViewById(R.id.button_start3);
-        button_start3.setOnClickListener(this);
-        button_start4 = (Button) findViewById(R.id.button_start4);
-        button_start4.setOnClickListener(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setOnClickListener(this);
         state = (TextView) findViewById(R.id.state);
@@ -337,69 +327,6 @@ public class Main2Activity extends AppCompatActivity
                     Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
                 }
                 break;
-
-            case R.id.button_start1:
-                if (!LaManApplication.canUseUsb)
-                    return;
-                final Timer timer1 = new Timer();
-                final int[] count = {0};
-                TimerTask timerTask1 = new TimerTask() {
-                    @Override
-                    public void run() {
-                        count[0]++;
-                        switch (count[0]) {
-                            case 1:
-                                UsbUtils.sendToUsb(SET_INIT_TIME);
-                                break;
-                            case 2:
-                                UsbUtils.sendToUsb(SET_POWER);
-                                break;
-                            case 3:
-                                UsbUtils.sendToUsb(OPEN_PORT);
-                                break;
-                            case 4:
-                                UsbUtils.sendToUsb(GET_DATA);
-                                break;
-                            case 5:
-                                UsbUtils.readFromUsb();
-                                break;
-                        }
-                        if (count[0] == 5) {
-                            timer1.cancel();
-                        }
-                    }
-                };
-                timer1.schedule(timerTask1, 50, 50);
-                break;
-            case R.id.button_start2:
-                if (LaManApplication.canUseUsb)
-                    UsbUtils.sendToUsb(CLOSE_PORT);
-                else
-                    UsbUtils.showTmsg(UsbUtils.twoByteToSignedInt((byte) 0x03, (byte) 0x08) + "");
-                break;
-            case R.id.button_start3:
-                if (LaManApplication.canUseUsb)
-                    UsbUtils.sendToUsb(OPEN_PORT);
-                else
-                    UsbUtils.showTmsg(UsbUtils.twoByteToUnsignedInt((byte) 0x03, (byte) 0x08) + "");
-                break;
-            case R.id.button_start4:
-                if (LaManApplication.canUseUsb) {
-                    lineChart.clear();
-                    xDataList.clear();
-                    yDataList.clear();
-                    stateText = new StringBuffer();
-                    stateText.append("开始测试。。。\n");
-                    UsbUtils.sendToUsb(GET_DATA);
-                    results = readFromUsb();
-                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
-                    handler.sendEmptyMessage(2);
-
-                    handler.sendEmptyMessage(0);
-                }
-
-                break;
-
         }
     }
 }

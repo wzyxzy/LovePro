@@ -13,7 +13,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "HIS_DATA".
 */
-public class HisDataDao extends AbstractDao<HisData, Integer> {
+public class HisDataDao extends AbstractDao<HisData, Long> {
 
     public static final String TABLENAME = "HIS_DATA";
 
@@ -22,7 +22,7 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, int.class, "id", true, "ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Data = new Property(1, byte[].class, "data", false, "DATA");
         public final static Property Date = new Property(2, String.class, "date", false, "DATE");
         public final static Property Name = new Property(3, String.class, "name", false, "NAME");
@@ -46,7 +46,7 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"HIS_DATA\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DATA\" BLOB," + // 1: data
                 "\"DATE\" TEXT," + // 2: date
                 "\"NAME\" TEXT," + // 3: name
@@ -66,7 +66,11 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, HisData entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         byte[] data = entity.getData();
         if (data != null) {
@@ -112,7 +116,11 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, HisData entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         byte[] data = entity.getData();
         if (data != null) {
@@ -156,14 +164,14 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
     }
 
     @Override
-    public Integer readKey(Cursor cursor, int offset) {
-        return cursor.getInt(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public HisData readEntity(Cursor cursor, int offset) {
         HisData entity = new HisData( //
-            cursor.getInt(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getBlob(offset + 1), // data
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // date
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // name
@@ -178,7 +186,7 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
      
     @Override
     public void readEntity(Cursor cursor, HisData entity, int offset) {
-        entity.setId(cursor.getInt(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setData(cursor.isNull(offset + 1) ? null : cursor.getBlob(offset + 1));
         entity.setDate(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -190,12 +198,13 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
      }
     
     @Override
-    protected final Integer updateKeyAfterInsert(HisData entity, long rowId) {
-        return entity.getId();
+    protected final Long updateKeyAfterInsert(HisData entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public Integer getKey(HisData entity) {
+    public Long getKey(HisData entity) {
         if(entity != null) {
             return entity.getId();
         } else {
@@ -205,7 +214,7 @@ public class HisDataDao extends AbstractDao<HisData, Integer> {
 
     @Override
     public boolean hasKey(HisData entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

@@ -6,8 +6,8 @@ import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class HisData {
-    @Id
-    private int id;
+    @Id(autoincrement = true)
+    private Long id;
     private byte[] data;//数据
     private String date;//日期
     private String name;//保存名字
@@ -16,8 +16,8 @@ public class HisData {
     private String testTime;//积分时间
     private String testPower;//功率
     private String testLocal;//测试地点
-    @Generated(hash = 846604088)
-    public HisData(int id, byte[] data, String date, String name, String testName,
+    @Generated(hash = 2108200367)
+    public HisData(Long id, byte[] data, String date, String name, String testName,
             String testAccount, String testTime, String testPower,
             String testLocal) {
         this.id = id;
@@ -33,10 +33,10 @@ public class HisData {
     @Generated(hash = 2089447536)
     public HisData() {
     }
-    public int getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
     public byte[] getData() {
@@ -87,5 +87,5 @@ public class HisData {
     public void setTestLocal(String testLocal) {
         this.testLocal = testLocal;
     }
-
+   
 }

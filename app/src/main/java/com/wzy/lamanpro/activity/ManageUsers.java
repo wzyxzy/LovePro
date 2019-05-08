@@ -36,7 +36,6 @@ public class ManageUsers extends AppCompatActivity implements View.OnClickListen
     }
 
     private void initData() {
-
         users = new UserDaoUtils(this).queryAllUsers();
         userAdapter = new UserAdapter(users, this, R.layout.item_users);
         userList.setAdapter(userAdapter);
@@ -49,6 +48,13 @@ public class ManageUsers extends AppCompatActivity implements View.OnClickListen
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        users = new UserDaoUtils(this).queryAllUsers();
+        userAdapter.updateRes(users);
     }
 
     private void initView() {
@@ -68,7 +74,9 @@ public class ManageUsers extends AppCompatActivity implements View.OnClickListen
                         .setAction("添加", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast.makeText(ManageUsers.this, "添加", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(ManageUsers.this, UserDetails.class);
+                                intent.putExtra("account", "");
+                                startActivity(intent);
                             }
                         }).show();
                 break;

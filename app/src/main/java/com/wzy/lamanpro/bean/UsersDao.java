@@ -13,7 +13,7 @@ import org.greenrobot.greendao.database.DatabaseStatement;
 /** 
  * DAO for table "USERS".
 */
-public class UsersDao extends AbstractDao<Users, String> {
+public class UsersDao extends AbstractDao<Users, Long> {
 
     public static final String TABLENAME = "USERS";
 
@@ -22,7 +22,7 @@ public class UsersDao extends AbstractDao<Users, String> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, String.class, "id", true, "ID");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Account = new Property(2, String.class, "account", false, "ACCOUNT");
         public final static Property Password = new Property(3, String.class, "password", false, "PASSWORD");
@@ -43,7 +43,7 @@ public class UsersDao extends AbstractDao<Users, String> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"USERS\" (" + //
-                "\"ID\" TEXT PRIMARY KEY NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
                 "\"ACCOUNT\" TEXT," + // 2: account
                 "\"PASSWORD\" TEXT," + // 3: password
@@ -61,9 +61,9 @@ public class UsersDao extends AbstractDao<Users, String> {
     protected final void bindValues(DatabaseStatement stmt, Users entity) {
         stmt.clearBindings();
  
-        String id = entity.getId();
+        Long id = entity.getId();
         if (id != null) {
-            stmt.bindString(1, id);
+            stmt.bindLong(1, id);
         }
  
         String name = entity.getName();
@@ -92,9 +92,9 @@ public class UsersDao extends AbstractDao<Users, String> {
     protected final void bindValues(SQLiteStatement stmt, Users entity) {
         stmt.clearBindings();
  
-        String id = entity.getId();
+        Long id = entity.getId();
         if (id != null) {
-            stmt.bindString(1, id);
+            stmt.bindLong(1, id);
         }
  
         String name = entity.getName();
@@ -120,14 +120,14 @@ public class UsersDao extends AbstractDao<Users, String> {
     }
 
     @Override
-    public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public Users readEntity(Cursor cursor, int offset) {
         Users entity = new Users( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // account
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // password
@@ -139,7 +139,7 @@ public class UsersDao extends AbstractDao<Users, String> {
      
     @Override
     public void readEntity(Cursor cursor, Users entity, int offset) {
-        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setAccount(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setPassword(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -148,12 +148,13 @@ public class UsersDao extends AbstractDao<Users, String> {
      }
     
     @Override
-    protected final String updateKeyAfterInsert(Users entity, long rowId) {
-        return entity.getId();
+    protected final Long updateKeyAfterInsert(Users entity, long rowId) {
+        entity.setId(rowId);
+        return rowId;
     }
     
     @Override
-    public String getKey(Users entity) {
+    public Long getKey(Users entity) {
         if(entity != null) {
             return entity.getId();
         } else {
