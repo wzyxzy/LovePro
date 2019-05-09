@@ -58,6 +58,7 @@ public class Main2Activity extends AppCompatActivity
     private StringBuffer stateText;
     private Toolbar toolbar;
     private TextView state;
+    private DrawerLayout drawer;
     List<String> xDataList = new ArrayList<>();// x轴数据源
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
     @SuppressLint("HandlerLeak")
@@ -178,7 +179,6 @@ public class Main2Activity extends AppCompatActivity
                 showStyleDialog();
                 break;
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -216,7 +216,7 @@ public class Main2Activity extends AppCompatActivity
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
         setSupportActionBar(toolbar);
         LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
