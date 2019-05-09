@@ -48,15 +48,18 @@ import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private static final byte[] SET_INIT_TIME = {0x09, 0x4F, 0x69, 0x74};//设置积分时间
-    private static final byte[] SET_POWER = {0x09, 0x4F, 0x70, 0x77, 0x00, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03, 0x00, 0x00, 0x42, 0x00, 0x00, 0x00};//设置能量大小
+    private static final byte[] SET_POWER = {0x09, 0x4F, 0x70, 0x77, 0x00, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03, 0x00, 0x00};//设置能量大小
     private static final byte[] OPEN_PORT = {0x09, 0x4f, 0x65, 0x70, 0x02, 0x00, 0x00, 0x00};//打开激光
     private static final byte[] GET_DATA = {0x09, 0x4F, 0x53, 0x4F};//获取波形
     private static final byte[] CLOSE_PORT = {0x09, 0x4f, 0x65, 0x70, 0x00, 0x00, 0x00, 0x00};//关闭激光
-    private static byte[] results;
+    private static byte[][] results;
+    private static float[] finalsResults;
     private LineChart lineChart;
     private Button button_start;
     private TextView text_report;
     private StringBuffer stateText;
+    private Toolbar toolbar;
+    private TextView state;
     List<String> xDataList = new ArrayList<>();// x轴数据源
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
     @SuppressLint("HandlerLeak")
@@ -66,22 +69,17 @@ public class Main2Activity extends AppCompatActivity
             super.handleMessage(msg);
             switch (msg.what) {
                 case 0:
-//                    Toast.makeText(Main2Activity.this, msg.obj + "", Toast.LENGTH_SHORT).show();
                     UsbUtils.sendToUsb(CLOSE_PORT);
-
-                    for (int i = 0; i < results.length; i += 2) {
-                        xDataList.add(String.valueOf(i / 2));
-                        yDataList.add(new Entry(UsbUtils.twoByteToUnsignedInt(results[i + 1], results[i]), i / 2));
+                    for (int i = 0; i < finalsResults.length; i++) {
+                        xDataList.add(String.valueOf(i));
+                        yDataList.add(new Entry(finalsResults[i], i));
                     }
-                    Log.e("y", yDataList.toString());
                     stateText.append("获取波形完成\n");
                     handler.sendEmptyMessage(2);
-
                     ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
-
                     break;
                 case 1:
-                    Toast.makeText(Main2Activity.this, "请输入合理范围内的时间", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Main2Activity.this, "请输入合理范围内的设置", Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
                     state.setText(stateText.toString());
@@ -89,9 +87,6 @@ public class Main2Activity extends AppCompatActivity
             }
         }
     };
-
-    private Toolbar toolbar;
-    private TextView state;
 
     @Override
     protected void onResume() {
@@ -120,25 +115,12 @@ public class Main2Activity extends AppCompatActivity
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         initView();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        TextView textView = (TextView) headerView.findViewById(R.id.textView);
-        textView.setText(new UserDaoUtils(this).queryUserName(SPUtility.getUserId(this)));
+
     }
 
     @Override
@@ -185,6 +167,7 @@ public class Main2Activity extends AppCompatActivity
                 startActivity(new Intent(Main2Activity.this, ManageData.class));
                 break;
             case R.id.nav_slideshow:
+                startActivity(new Intent(Main2Activity.this, ManageHis.class));
                 break;
             case R.id.nav_manage:
                 startActivity(new Intent(Main2Activity.this, ManageUsers.class));
@@ -200,24 +183,6 @@ public class Main2Activity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-//    private void showStyleDialog() {
-//
-//        CommonDialog commonDialog = new CommonDialog(this);
-//        commonDialog.setTitle("温 馨 提 示 :");
-//        commonDialog.setMessage("您确定注销吗？");
-//        commonDialog.setRightButtonClickListener(new CommonDialog.RightButtonClickListener() {
-//            @Override
-//            public void onRightButtonClick() {
-//                SPUtility.putSPBoolean(Main2Activity.this, "isAutoLogin", false);
-//                finish();
-//                Intent intent = new Intent(Main2Activity.this, LoginActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//        commonDialog.show();
-//    }
 
     protected void showStyleDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -250,6 +215,18 @@ public class Main2Activity extends AppCompatActivity
         toolbar.setOnClickListener(this);
         state = (TextView) findViewById(R.id.state);
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
+        setSupportActionBar(toolbar);
+        LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView textView = (TextView) headerView.findViewById(R.id.textView);
+        textView.setText(new UserDaoUtils(this).queryUserName(SPUtility.getUserId(this)));
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("请注意：不要对可疑对燃点物质扫描！！！\n请注意：执行扫描时请勿对着眼睛！！！");
         builder.setTitle("温 馨 提 示 :");
@@ -267,7 +244,6 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
-
                 if (LaManApplication.canUseUsb) {
                     lineChart.clear();
                     xDataList.clear();
@@ -275,7 +251,12 @@ public class Main2Activity extends AppCompatActivity
                     stateText = new StringBuffer();
                     stateText.append("开始测试。。。\n");
                     handler.sendEmptyMessage(2);
-                    final int[] count = {0};
+                    final int[] count = {0, 0};
+                    final int once = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
+                    final int time = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
+                    final int power = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
+                    results = new byte[once][4200];
+                    finalsResults = new float[2100];
                     final Timer timer = new Timer();
                     TimerTask timerTask = new TimerTask() {
                         @Override
@@ -283,43 +264,62 @@ public class Main2Activity extends AppCompatActivity
                             switch (count[0]) {
                                 case 0:
                                     try {
-                                        int time = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
+                                        stateText.append("第" + (count[1] + 1) + "次积分：\n积分时间设置完毕，积分时间为" + time + "毫秒。\n");
+//                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
                                         handler.sendEmptyMessage(1);
                                     }
                                     break;
                                 case 1:
-                                    UsbUtils.sendToUsb(SET_POWER);
-                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
-                                    handler.sendEmptyMessage(2);
+                                    try {
+                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(power)));
+                                        stateText.append("功率设置发送完毕，功率设置为：" + power + "。\n");
+//                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
+                                        handler.sendEmptyMessage(2);
+                                    } catch (NumberFormatException e) {
+                                        handler.sendEmptyMessage(1);
+                                    }
                                     break;
                                 case 2:
-
                                     UsbUtils.sendToUsb(OPEN_PORT);
-                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
+                                    stateText.append("打开激光发送完毕。\n");
+//                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
                                     handler.sendEmptyMessage(2);
-
                                     break;
                                 case 3:
                                     UsbUtils.sendToUsb(GET_DATA);
-                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
+                                    stateText.append("获取波形发送完毕。\n");
+//                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
                                     handler.sendEmptyMessage(2);
-
                                     break;
                                 case 4:
-                                    results = readFromUsb();
-                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
-                                    handler.sendEmptyMessage(0);
+                                    results[count[1]++] = readFromUsb();
+                                    stateText.append("返回结果完毕并存储。\n");
+//                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                                     break;
                                 case 5:
-
+                                    for (int i = 0; i < finalsResults.length; i++) {
+                                        finalsResults[i] = UsbUtils.twoByteToUnsignedInt(results[0][2 * i + 1], results[0][2 * i]);
+                                    }
+                                    label1:
+                                    for (int i = 0; i < results.length; i++) {
+                                        for (int j = 0; j < finalsResults.length; j++) {
+                                            if (i == 0) {
+                                                continue label1;
+                                            } else {
+                                                finalsResults[j] = (finalsResults[j] + UsbUtils.twoByteToUnsignedInt(results[i][2 * j + 1], results[i][2 * j])) / 2;
+                                            }
+                                        }
+                                    }
+                                    handler.sendEmptyMessage(0);
                                     timer.cancel();
                                     break;
                             }
                             count[0]++;
+                            if (once > count[1] + 1)
+                                count[0] %= 5;
                         }
                     };
                     timer.schedule(timerTask, 50, 50);

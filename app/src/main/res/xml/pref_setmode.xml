@@ -10,7 +10,7 @@
         android:dialogTitle="功率"
         android:key="power"
         android:numeric="integer"
-        android:summary="30"
+        android:summary="66"
         android:title="功率" />
 
     <EditTextPreference
