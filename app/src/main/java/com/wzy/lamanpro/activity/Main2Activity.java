@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,8 +17,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,16 +28,15 @@ import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
+import com.orhanobut.logger.Logger;
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.common.LaManApplication;
 import com.wzy.lamanpro.dao.UserDaoUtils;
-import com.wzy.lamanpro.ui.CommonDialog;
 import com.wzy.lamanpro.utils.ChartUtil;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -162,6 +160,7 @@ public class Main2Activity extends AppCompatActivity
         // Handle navigation view item clicks here.
         switch (item.getItemId()) {
             case R.id.nav_camera:
+                startActivity(new Intent(Main2Activity.this, AddLibrary.class));
                 break;
             case R.id.nav_gallery:
                 startActivity(new Intent(Main2Activity.this, ManageData.class));
@@ -230,7 +229,6 @@ public class Main2Activity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("请注意：不要对可疑对燃点物质扫描！！！\n请注意：执行扫描时请勿对着眼睛！！！");
         builder.setTitle("温 馨 提 示 :");
-//        builder.set
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -252,9 +250,9 @@ public class Main2Activity extends AppCompatActivity
                     stateText.append("开始测试。。。\n");
                     handler.sendEmptyMessage(2);
                     final int[] count = {0, 0};
-                    final int once = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
-                    final int time = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
-                    final int power = Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
+                    final int once = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
+                    final int time = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
+                    final int power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
                     results = new byte[once][4200];
                     finalsResults = new float[2100];
                     final Timer timer = new Timer();
@@ -274,7 +272,7 @@ public class Main2Activity extends AppCompatActivity
                                     break;
                                 case 1:
                                     try {
-                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(power)));
+                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
                                         stateText.append("功率设置发送完毕，功率设置为：" + power + "。\n");
 //                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
                                         handler.sendEmptyMessage(2);

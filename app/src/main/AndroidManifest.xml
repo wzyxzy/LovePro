@@ -26,6 +26,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".activity.AddLibrary"
+            android:label="@string/title_activity_add_library"
+            android:parentActivityName=".activity.Main2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.wzy.lamanpro.activity.Main2Activity" />
+        </activity>
+        <activity
             android:name=".activity.ManageHis"
             android:label="@string/title_activity_manage_his"
             android:parentActivityName=".activity.Main2Activity">

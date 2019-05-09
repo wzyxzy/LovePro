@@ -103,4 +103,5 @@
     <string name="title_activity_manage_users">用户管理</string>
     <string name="title_activity_manage_data">数据库管理</string>
     <string name="title_activity_manage_his">测试数据管理</string>
+    <string name="title_activity_add_library">AddLibrary</string>
 </resources>

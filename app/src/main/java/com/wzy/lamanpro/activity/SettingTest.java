@@ -30,6 +30,9 @@ public class SettingTest extends PreferenceActivity implements Preference.OnPref
         once = findPreference("once");
         power = findPreference("power");
 //        bindPreferenceSummaryToValue(findPreference("use_mode"));
+//        time.setDefaultValue(500);
+//        once.setDefaultValue(10);
+//        power.setDefaultValue(66);
         bindPreferenceSummaryToValue(time);
         bindPreferenceSummaryToValue(once);
         bindPreferenceSummaryToValue(power);
