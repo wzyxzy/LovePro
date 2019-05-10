@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -66,6 +64,8 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                         xDataList.add(String.valueOf(i));
                         yDataList.add(new Entry(finalsResults[i], i));
                     }
+                    button_start.setEnabled(true);
+                    button_start.setText("开始测试");
                     stateText.append("获取波形完成\n");
                     handler.sendEmptyMessage(2);
                     ChartUtil.showChart(AddLibrary.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
@@ -159,6 +159,8 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     yDataList.clear();
                     stateText = new StringBuffer();
                     stateText.append("开始测试。。。\n");
+                    button_start.setEnabled(false);
+                    button_start.setText("正在测试");
                     handler.sendEmptyMessage(2);
                     final int[] count = {0, 0};
                     final int once = TextUtils.isEmpty(SPUtility.getSPString(AddLibrary.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(AddLibrary.this, "once"));
@@ -174,7 +176,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                 case 0:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("第" + (count[1] + 1) + "次积分：\n积分时间设置完毕，积分时间为" + time + "毫秒。\n");
+                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间设置完毕，积分时间为" + time + "毫秒。  ");
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -193,19 +195,19 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                     break;
                                 case 2:
                                     UsbUtils.sendToUsb(OPEN_PORT);
-                                    stateText.append("打开激光发送完毕。\n");
+//                                    stateText.append("打开激光发送完毕。\n");
 //                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
                                     handler.sendEmptyMessage(2);
                                     break;
                                 case 3:
                                     UsbUtils.sendToUsb(GET_DATA);
-                                    stateText.append("获取波形发送完毕。\n");
+//                                    stateText.append("获取波形发送完毕。\n");
 //                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
                                     handler.sendEmptyMessage(2);
                                     break;
                                 case 4:
                                     results[count[1]++] = readFromUsb();
-                                    stateText.append("返回结果完毕并存储。\n");
+//                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                                     break;
                                 case 5:
@@ -235,17 +237,6 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                 } else {
                     Toast.makeText(AddLibrary.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
                 }
-                break;
-            case R.id.fab:
-                Snackbar.make(v, "点击即可将此库建立并保存，确定要建库吗？", Snackbar.LENGTH_LONG)
-                        .setAction("确定", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent(AddLibrary.this, UserDetails.class);
-                                intent.putExtra("account", "");
-                                startActivity(intent);
-                            }
-                        }).show();
                 break;
         }
     }

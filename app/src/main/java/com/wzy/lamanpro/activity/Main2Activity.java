@@ -1,16 +1,26 @@
 package com.wzy.lamanpro.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -19,25 +29,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
-import com.orhanobut.logger.Logger;
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.common.LaManApplication;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
+import com.wzy.lamanpro.utils.PermissionGetting;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,6 +64,7 @@ public class Main2Activity extends AppCompatActivity
     private static final byte[] OPEN_PORT = {0x09, 0x4f, 0x65, 0x70, 0x02, 0x00, 0x00, 0x00};//打开激光
     private static final byte[] GET_DATA = {0x09, 0x4F, 0x53, 0x4F};//获取波形
     private static final byte[] CLOSE_PORT = {0x09, 0x4f, 0x65, 0x70, 0x00, 0x00, 0x00, 0x00};//关闭激光
+    private static final String TAG = Main2Activity.class.getSimpleName();
     private static byte[][] results;
     private static float[] finalsResults;
     private LineChart lineChart;
@@ -59,8 +74,12 @@ public class Main2Activity extends AppCompatActivity
     private Toolbar toolbar;
     private TextView state;
     private DrawerLayout drawer;
+    private String locationName;
     List<String> xDataList = new ArrayList<>();// x轴数据源
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
+    //定位都要通过LocationManager这个类实现
+    private LocationManager locationManager;
+    private String provider;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -73,6 +92,8 @@ public class Main2Activity extends AppCompatActivity
                         xDataList.add(String.valueOf(i));
                         yDataList.add(new Entry(finalsResults[i], i));
                     }
+                    button_start.setEnabled(true);
+                    button_start.setText("开始测试");
                     stateText.append("获取波形完成\n");
                     handler.sendEmptyMessage(2);
                     ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
@@ -86,6 +107,9 @@ public class Main2Activity extends AppCompatActivity
             }
         }
     };
+    private FloatingActionButton fab;
+    private NavigationView nav_view;
+    private DrawerLayout drawer_layout;
 
     @Override
     protected void onResume() {
@@ -206,6 +230,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void initView() {
+        stateText = new StringBuffer();
         lineChart = findViewById(R.id.lineChart);
         button_start = findViewById(R.id.button_start);
         text_report = findViewById(R.id.text_report);
@@ -236,6 +261,125 @@ public class Main2Activity extends AppCompatActivity
             }
         });
         builder.create().show();
+        //获取定位服务
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //获取当前可用的位置控制器
+        List<String> list = locationManager.getProviders(true);
+        if (list.contains(LocationManager.GPS_PROVIDER)) {
+            //是否为GPS位置控制器
+            provider = LocationManager.GPS_PROVIDER;
+        } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
+            //是否为网络位置控制器
+            provider = LocationManager.NETWORK_PROVIDER;
+
+        } else {
+            Toast.makeText(this, "请检查网络或GPS是否打开",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(Main2Activity.this, "我们需要获取位置的权限，请授予！", Toast.LENGTH_SHORT).show();
+            PermissionGetting.showToAppSettingDialog();
+        } else {
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                //获取当前位置，这里只用到了经纬度
+                locationName = getLocationAddress(location);
+                stateText.append("位置是：" + locationName);
+                handler.sendEmptyMessage(2);
+            }
+
+            //绑定定位事件，监听位置是否改变
+            //第一个参数为控制器类型第二个参数为监听位置变化的时间间隔（单位：毫秒）
+            //第三个参数为位置变化的间隔（单位：米）第四个参数为位置监听器
+            locationManager.requestLocationUpdates(provider, 2000, 2,
+                    locationListener);
+        }
+
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+        nav_view = (NavigationView) findViewById(R.id.nav_view);
+        nav_view.setOnClickListener(this);
+        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer_layout.setOnClickListener(this);
+    }
+
+    LocationListener locationListener = new LocationListener() {
+
+        @Override
+        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderEnabled(String arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onProviderDisabled(String arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onLocationChanged(Location arg0) {
+            // TODO Auto-generated method stub
+            // 更新当前经纬度
+//            locationName = getLocationAddress(arg0);
+//            stateText.append("位置是：" + locationName);
+//            handler.sendEmptyMessage(2);
+        }
+    };
+
+    /**
+     * 将经纬度转换成中文地址
+     *
+     * @param location
+     * @return
+     */
+    private String getLocationAddress(Location location) {
+        String add = "";
+        Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.CHINESE);
+        try {
+            List<Address> addresses = geoCoder.getFromLocation(
+                    location.getLatitude(), location.getLongitude(),
+                    1);
+            Address address = addresses.get(0);
+            Log.i(TAG, "getLocationAddress: " + address.toString());
+            // Address[addressLines=[0:"中国",1:"北京市海淀区",2:"华奥饭店公司写字间中关村创业大街"]latitude=39.980973,hasLongitude=true,longitude=116.301712]
+            int maxLine = address.getMaxAddressLineIndex();
+//            if (maxLine >= 2) {
+//                add = address.getAddressLine(1) + address.getAddressLine(2);
+//            } else {
+//                add = address.getAddressLine(1);
+//            }
+            add = address.getAddressLine(0);
+        } catch (IOException e) {
+            add = "";
+            e.printStackTrace();
+        }
+        return add;
+    }
+
+    //关闭时解除监听器
+    @Override
+    protected void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        if (locationManager != null) {
+            locationManager.removeUpdates(locationListener);
+        }
     }
 
     @Override
@@ -248,6 +392,8 @@ public class Main2Activity extends AppCompatActivity
                     yDataList.clear();
                     stateText = new StringBuffer();
                     stateText.append("开始测试。。。\n");
+                    button_start.setEnabled(false);
+                    button_start.setText("正在测试");
                     handler.sendEmptyMessage(2);
                     final int[] count = {0, 0};
                     final int once = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
@@ -263,7 +409,7 @@ public class Main2Activity extends AppCompatActivity
                                 case 0:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("第" + (count[1] + 1) + "次积分：\n积分时间设置完毕，积分时间为" + time + "毫秒。\n");
+                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间设置完毕，积分时间为" + time + "毫秒。  ");
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -282,19 +428,19 @@ public class Main2Activity extends AppCompatActivity
                                     break;
                                 case 2:
                                     UsbUtils.sendToUsb(OPEN_PORT);
-                                    stateText.append("打开激光发送完毕。\n");
+//                                    stateText.append("打开激光发送完毕。\n");
 //                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
                                     handler.sendEmptyMessage(2);
                                     break;
                                 case 3:
                                     UsbUtils.sendToUsb(GET_DATA);
-                                    stateText.append("获取波形发送完毕。\n");
+//                                    stateText.append("获取波形发送完毕。\n");
 //                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
                                     handler.sendEmptyMessage(2);
                                     break;
                                 case 4:
                                     results[count[1]++] = readFromUsb();
-                                    stateText.append("返回结果完毕并存储。\n");
+//                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                                     break;
                                 case 5:
@@ -324,6 +470,26 @@ public class Main2Activity extends AppCompatActivity
                 } else {
                     Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.fab:
+                Snackbar.make(v, "点击此处可以保存测试数据，是否要保存？", Snackbar.LENGTH_LONG)
+                        .setAction("保存", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final EditText et = new EditText(Main2Activity.this);
+                                new AlertDialog.Builder(Main2Activity.this)
+                                        .setIcon(android.R.drawable.ic_dialog_info)
+                                        .setView(et)
+                                        .setTitle("请输入要保存的名字")
+                                        .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String input = et.getText().toString();
+                                                dialog.dismiss();
+                                            }
+                                        }).setNegativeButton("取消", null).create().show();
+                            }
+                        }).show();
                 break;
         }
     }

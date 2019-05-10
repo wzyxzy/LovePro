@@ -1,22 +1,44 @@
 package com.wzy.lamanpro.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.common.CommonActivity;
+import com.wzy.lamanpro.utils.PermissionGetting;
+import com.wzy.lamanpro.utils.PermissionListener;
+
+import java.util.Arrays;
 
 public class FirstActivity extends CommonActivity {
+    private String[] myPermissions = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
-        mHandler.sendEmptyMessageDelayed(GOTO_MAIN_ACTIVITY, 3000);//3秒跳转
+        PermissionGetting.setPermissionListener(new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+//                initData();
+                mHandler.sendEmptyMessageDelayed(GOTO_MAIN_ACTIVITY, 2000);//3秒跳转
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+
+            }
+        }, this, myPermissions);
 
 
         if (Build.VERSION.SDK_INT > 15 && Build.VERSION.SDK_INT < 19) {
@@ -30,8 +52,27 @@ public class FirstActivity extends CommonActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull final String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionGetting.onRequestPermissionsResult(requestCode, permissions, grantResults, new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                mHandler.sendEmptyMessageDelayed(GOTO_MAIN_ACTIVITY, 1000);//3秒跳转
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Toast.makeText(FirstActivity.this, "我们需要" + Arrays.toString(permissions) + "权限", Toast.LENGTH_SHORT).show();
+                PermissionGetting.showToAppSettingDialog();
+            }
+        });
+
+    }
+
     private static final int GOTO_MAIN_ACTIVITY = 0;
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
 
             switch (msg.what) {
@@ -45,7 +86,9 @@ public class FirstActivity extends CommonActivity {
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
 
 }
