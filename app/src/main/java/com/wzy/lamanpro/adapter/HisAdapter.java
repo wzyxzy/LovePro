@@ -19,7 +19,7 @@ public class HisAdapter extends WZYBaseAdapter<HisData> {
     public void bindData(ViewHolder holder, HisData hisData, int indexPostion) {
         TextView name = (TextView) holder.getView(R.id.name);
         TextView account = (TextView) holder.getView(R.id.account);
-        TextView email = (TextView) holder.getView(R.id.email);
+//        TextView email = (TextView) holder.getView(R.id.email);
         name.setText(hisData.getName());
         account.setText(hisData.getDate());
 //        email.setText(users.getEmail());
