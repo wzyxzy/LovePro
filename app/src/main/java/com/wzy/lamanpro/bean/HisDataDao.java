@@ -23,7 +23,7 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Data = new Property(1, byte[].class, "data", false, "DATA");
+        public final static Property Data = new Property(1, String.class, "data", false, "DATA");
         public final static Property Date = new Property(2, String.class, "date", false, "DATE");
         public final static Property Name = new Property(3, String.class, "name", false, "NAME");
         public final static Property TestName = new Property(4, String.class, "testName", false, "TEST_NAME");
@@ -47,7 +47,7 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"HIS_DATA\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"DATA\" BLOB," + // 1: data
+                "\"DATA\" TEXT," + // 1: data
                 "\"DATE\" TEXT," + // 2: date
                 "\"NAME\" TEXT," + // 3: name
                 "\"TEST_NAME\" TEXT," + // 4: testName
@@ -72,9 +72,9 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
             stmt.bindLong(1, id);
         }
  
-        byte[] data = entity.getData();
+        String data = entity.getData();
         if (data != null) {
-            stmt.bindBlob(2, data);
+            stmt.bindString(2, data);
         }
  
         String date = entity.getDate();
@@ -122,9 +122,9 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
             stmt.bindLong(1, id);
         }
  
-        byte[] data = entity.getData();
+        String data = entity.getData();
         if (data != null) {
-            stmt.bindBlob(2, data);
+            stmt.bindString(2, data);
         }
  
         String date = entity.getDate();
@@ -172,7 +172,7 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
     public HisData readEntity(Cursor cursor, int offset) {
         HisData entity = new HisData( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getBlob(offset + 1), // data
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // data
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // date
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // name
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // testName
@@ -187,7 +187,7 @@ public class HisDataDao extends AbstractDao<HisData, Long> {
     @Override
     public void readEntity(Cursor cursor, HisData entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setData(cursor.isNull(offset + 1) ? null : cursor.getBlob(offset + 1));
+        entity.setData(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDate(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setTestName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));

@@ -131,8 +131,9 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
             case R.id.action_settings:
                 startActivity(new Intent(AddLibrary.this, SettingTest.class));
                 return true;
-            case R.id.action_report:
-                break;
+//            case R.id.action_report:
+//
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -157,15 +158,15 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     lineChart.clear();
                     xDataList.clear();
                     yDataList.clear();
-                    stateText = new StringBuffer();
-                    stateText.append("开始测试。。。\n");
-                    button_start.setEnabled(false);
-                    button_start.setText("正在测试");
-                    handler.sendEmptyMessage(2);
                     final int[] count = {0, 0};
                     final int once = TextUtils.isEmpty(SPUtility.getSPString(AddLibrary.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(AddLibrary.this, "once"));
                     final int time = TextUtils.isEmpty(SPUtility.getSPString(AddLibrary.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(AddLibrary.this, "time"));
                     final int power = TextUtils.isEmpty(SPUtility.getSPString(AddLibrary.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(AddLibrary.this, "power"));
+                    stateText = new StringBuffer();
+                    stateText.append("开始测试，积分次数为" + once + "次\n");
+                    button_start.setEnabled(false);
+                    button_start.setText("正在测试");
+                    handler.sendEmptyMessage(2);
                     results = new byte[once][4200];
                     finalsResults = new float[2100];
                     final Timer timer = new Timer();
@@ -176,7 +177,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                 case 0:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间设置完毕，积分时间为" + time + "毫秒。  ");
+                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ");
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -186,7 +187,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                 case 1:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
-                                        stateText.append("功率设置发送完毕，功率设置为：" + power + "。\n");
+                                        stateText.append("功率为：" + power + "。\n");
 //                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -229,7 +230,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                     break;
                             }
                             count[0]++;
-                            if (once > count[1] + 1)
+                            if (once >= count[1] + 1)
                                 count[0] %= 5;
                         }
                     };

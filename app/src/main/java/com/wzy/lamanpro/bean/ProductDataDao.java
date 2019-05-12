@@ -24,7 +24,7 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property ProName = new Property(1, String.class, "proName", false, "PRO_NAME");
-        public final static Property Data = new Property(2, byte[].class, "data", false, "DATA");
+        public final static Property Data = new Property(2, String.class, "data", false, "DATA");
         public final static Property UserName = new Property(3, String.class, "userName", false, "USER_NAME");
         public final static Property UserCompany = new Property(4, String.class, "userCompany", false, "USER_COMPANY");
         public final static Property ProHSCode = new Property(5, String.class, "proHSCode", false, "PRO_HSCODE");
@@ -55,7 +55,7 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"PRODUCT_DATA\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"PRO_NAME\" TEXT," + // 1: proName
-                "\"DATA\" BLOB," + // 2: data
+                "\"DATA\" TEXT," + // 2: data
                 "\"USER_NAME\" TEXT," + // 3: userName
                 "\"USER_COMPANY\" TEXT," + // 4: userCompany
                 "\"PRO_HSCODE\" TEXT," + // 5: proHSCode
@@ -91,9 +91,9 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
             stmt.bindString(2, proName);
         }
  
-        byte[] data = entity.getData();
+        String data = entity.getData();
         if (data != null) {
-            stmt.bindBlob(3, data);
+            stmt.bindString(3, data);
         }
  
         String userName = entity.getUserName();
@@ -176,9 +176,9 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
             stmt.bindString(2, proName);
         }
  
-        byte[] data = entity.getData();
+        String data = entity.getData();
         if (data != null) {
-            stmt.bindBlob(3, data);
+            stmt.bindString(3, data);
         }
  
         String userName = entity.getUserName();
@@ -257,7 +257,7 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
         ProductData entity = new ProductData( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // proName
-            cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2), // data
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // data
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // userName
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // userCompany
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // proHSCode
@@ -279,7 +279,7 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
     public void readEntity(Cursor cursor, ProductData entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setProName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setData(cursor.isNull(offset + 2) ? null : cursor.getBlob(offset + 2));
+        entity.setData(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setUserName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setUserCompany(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setProHSCode(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));

@@ -8,7 +8,7 @@ import org.greenrobot.greendao.annotation.Generated;
 public class HisData {
     @Id(autoincrement = true)
     private Long id;
-    private byte[] data;//数据
+    private String data;//数据
     private String date;//日期
     private String name;//保存名字
     private String testName;//测试者姓名
@@ -16,8 +16,8 @@ public class HisData {
     private String testTime;//积分时间
     private String testPower;//功率
     private String testLocal;//测试地点
-    @Generated(hash = 2108200367)
-    public HisData(Long id, byte[] data, String date, String name, String testName,
+    @Generated(hash = 1834219352)
+    public HisData(Long id, String data, String date, String name, String testName,
             String testAccount, String testTime, String testPower,
             String testLocal) {
         this.id = id;
@@ -30,6 +30,18 @@ public class HisData {
         this.testPower = testPower;
         this.testLocal = testLocal;
     }
+
+    public HisData(String data, String date, String name, String testName, String testAccount, String testTime, String testPower, String testLocal) {
+        this.data = data;
+        this.date = date;
+        this.name = name;
+        this.testName = testName;
+        this.testAccount = testAccount;
+        this.testTime = testTime;
+        this.testPower = testPower;
+        this.testLocal = testLocal;
+    }
+
     @Generated(hash = 2089447536)
     public HisData() {
     }
@@ -39,10 +51,10 @@ public class HisData {
     public void setId(Long id) {
         this.id = id;
     }
-    public byte[] getData() {
+    public String getData() {
         return this.data;
     }
-    public void setData(byte[] data) {
+    public void setData(String data) {
         this.data = data;
     }
     public String getDate() {
@@ -87,5 +99,7 @@ public class HisData {
     public void setTestLocal(String testLocal) {
         this.testLocal = testLocal;
     }
-   
+
+    
+
 }

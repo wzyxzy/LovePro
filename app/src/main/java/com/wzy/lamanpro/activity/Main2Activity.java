@@ -2,6 +2,7 @@ package com.wzy.lamanpro.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,7 +42,9 @@ import android.widget.Toast;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.common.LaManApplication;
+import com.wzy.lamanpro.dao.HisDaoUtils;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
 import com.wzy.lamanpro.utils.PermissionGetting;
@@ -49,7 +52,9 @@ import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -79,6 +84,9 @@ public class Main2Activity extends AppCompatActivity
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
     //定位都要通过LocationManager这个类实现
     private LocationManager locationManager;
+    private int once;
+    private int time;
+    private int power;
     private String provider;
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -173,8 +181,8 @@ public class Main2Activity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent(Main2Activity.this, SettingTest.class));
                 return true;
-            case R.id.action_report:
-                break;
+//            case R.id.action_report:
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -336,9 +344,15 @@ public class Main2Activity extends AppCompatActivity
         public void onLocationChanged(Location arg0) {
             // TODO Auto-generated method stub
             // 更新当前经纬度
+            if (TextUtils.isEmpty(locationName)) {
+                locationName = getLocationAddress(arg0);
+                stateText.append("位置是：" + locationName);
+                handler.sendEmptyMessage(2);
+            }
 //            locationName = getLocationAddress(arg0);
 //            stateText.append("位置是：" + locationName);
 //            handler.sendEmptyMessage(2);
+
         }
     };
 
@@ -358,7 +372,7 @@ public class Main2Activity extends AppCompatActivity
             Address address = addresses.get(0);
             Log.i(TAG, "getLocationAddress: " + address.toString());
             // Address[addressLines=[0:"中国",1:"北京市海淀区",2:"华奥饭店公司写字间中关村创业大街"]latitude=39.980973,hasLongitude=true,longitude=116.301712]
-            int maxLine = address.getMaxAddressLineIndex();
+//            int maxLine = address.getMaxAddressLineIndex();
 //            if (maxLine >= 2) {
 //                add = address.getAddressLine(1) + address.getAddressLine(2);
 //            } else {
@@ -368,6 +382,8 @@ public class Main2Activity extends AppCompatActivity
         } catch (IOException e) {
             add = "";
             e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
+            add = "获取位置失败！";
         }
         return add;
     }
@@ -390,15 +406,15 @@ public class Main2Activity extends AppCompatActivity
                     lineChart.clear();
                     xDataList.clear();
                     yDataList.clear();
+                    final int[] count = {0, 0};
+                    once = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
+                    time = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
+                    power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
                     stateText = new StringBuffer();
-                    stateText.append("开始测试。。。\n");
+                    stateText.append("开始测试，积分次数为" + once + "次\n");
                     button_start.setEnabled(false);
                     button_start.setText("正在测试");
                     handler.sendEmptyMessage(2);
-                    final int[] count = {0, 0};
-                    final int once = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
-                    final int time = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
-                    final int power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
                     results = new byte[once][4200];
                     finalsResults = new float[2100];
                     final Timer timer = new Timer();
@@ -409,7 +425,7 @@ public class Main2Activity extends AppCompatActivity
                                 case 0:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间设置完毕，积分时间为" + time + "毫秒。  ");
+                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ");
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -419,7 +435,7 @@ public class Main2Activity extends AppCompatActivity
                                 case 1:
                                     try {
                                         UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
-                                        stateText.append("功率设置发送完毕，功率设置为：" + power + "。\n");
+                                        stateText.append("功率为：" + power + "。\n");
 //                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
                                         handler.sendEmptyMessage(2);
                                     } catch (NumberFormatException e) {
@@ -462,7 +478,7 @@ public class Main2Activity extends AppCompatActivity
                                     break;
                             }
                             count[0]++;
-                            if (once > count[1] + 1)
+                            if (once >= count[1] + 1)
                                 count[0] %= 5;
                         }
                     };
@@ -476,6 +492,10 @@ public class Main2Activity extends AppCompatActivity
                         .setAction("保存", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                if (finalsResults == null || finalsResults.length == 0) {
+                                    Toast.makeText(Main2Activity.this, "还没有测试数据，请先测试！", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 final EditText et = new EditText(Main2Activity.this);
                                 new AlertDialog.Builder(Main2Activity.this)
                                         .setIcon(android.R.drawable.ic_dialog_info)
@@ -484,7 +504,17 @@ public class Main2Activity extends AppCompatActivity
                                         .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                ProgressDialog pd2 = ProgressDialog.show(Main2Activity.this, "温馨提示", "正在保存...");
                                                 String input = et.getText().toString();
+                                                String userid = SPUtility.getUserId(Main2Activity.this);
+                                                StringBuffer stringBuffer = new StringBuffer();
+                                                for (float finalsResult : finalsResults) {
+                                                    stringBuffer.append(finalsResult + ",");
+                                                }
+                                                new HisDaoUtils(Main2Activity.this).insertHisDataList(new HisData(stringBuffer.toString(), new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()), input, new UserDaoUtils(Main2Activity.this).queryUserName(userid),
+                                                        userid, String.valueOf(time), String.valueOf(power),
+                                                        locationName));
+                                                pd2.dismiss();
                                                 dialog.dismiss();
                                             }
                                         }).setNegativeButton("取消", null).create().show();
