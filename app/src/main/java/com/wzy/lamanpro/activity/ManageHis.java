@@ -1,7 +1,10 @@
 package com.wzy.lamanpro.activity;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,7 +17,11 @@ import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.bean.ProductData;
 import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.dao.HisDaoUtils;
+import com.wzy.lamanpro.dao.UserDaoUtils;
+import com.wzy.lamanpro.utils.SPUtility;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ManageHis extends AppCompatActivity {
@@ -39,9 +46,27 @@ public class ManageHis extends AppCompatActivity {
         hisList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ManageHis.this, UserDetails.class);
+                Intent intent = new Intent(ManageHis.this, HisDetails.class);
                 intent.putExtra("id", hisData.get(position).getId());
                 startActivity(intent);
+            }
+        });
+        hisList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, final long id) {
+                new AlertDialog.Builder(ManageHis.this)
+                        .setTitle("温馨提示")
+                        .setMessage("确定要删除吗？")
+                        .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new HisDaoUtils(ManageHis.this).deleteUser(hisData.get(position).getId());
+                                hisData = new HisDaoUtils(ManageHis.this).queryAllData();
+                                hisAdapter.updateRes(hisData);
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton("取消", null).create().show();
+                return true;
             }
         });
 

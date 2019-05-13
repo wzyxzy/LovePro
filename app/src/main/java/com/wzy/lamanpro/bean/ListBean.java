@@ -19,4 +19,9 @@ public class ListBean {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public ListBean(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 }

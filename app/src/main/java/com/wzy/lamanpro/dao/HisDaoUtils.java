@@ -10,6 +10,8 @@ import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.bean.HisDataDao;
 import com.wzy.lamanpro.bean.ProductData;
 import com.wzy.lamanpro.bean.ProductDataDao;
+import com.wzy.lamanpro.bean.Users;
+import com.wzy.lamanpro.bean.UsersDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -112,6 +114,14 @@ public class HisDaoUtils {
         QueryBuilder<HisData> qb = hisDataDao.queryBuilder();
         qb.where(HisDataDao.Properties.Id.eq(id));
         return qb.list().get(0);
+    }
+
+    /**
+     * 删除数据
+     */
+    public void deleteUser(Long id) {
+        QueryBuilder<HisData> qb = hisDataDao.queryBuilder();
+        qb.where(HisDataDao.Properties.Id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
     }
 
     /**

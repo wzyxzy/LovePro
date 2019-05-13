@@ -3,16 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.wzy.lamanpro"
     android:installLocation="internalOnly">
-    <!--配置开机自启权限-->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 两种provider的权限 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- 仅网络定位的权限 -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!--<uses-permission android:name="android.permission.SHUTDOWN"-->
-        <!--tools:ignore="ProtectedPermissions" />-->
+    <!-- 配置开机自启权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 两种provider的权限 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 仅网络定位的权限 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- <uses-permission android:name="android.permission.SHUTDOWN" -->
+    <!-- tools:ignore="ProtectedPermissions" /> -->
     <uses-permission
         android:name="android.permission.HARDWARE_TEST"
         tools:ignore="ProtectedPermissions" />
@@ -34,6 +30,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".activity.HisDetails"
+            android:label="@string/title_activity_his_details"
+            android:parentActivityName=".activity.ManageHis">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.wzy.lamanpro.activity.ManageHis" />
+        </activity>
         <activity
             android:name=".activity.AddLibrary"
             android:label="@string/title_activity_add_library"
@@ -123,14 +127,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver
             android:name=".service.MyReceiver"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
-            >
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
