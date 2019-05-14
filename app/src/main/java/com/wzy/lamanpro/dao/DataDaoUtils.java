@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import com.wzy.lamanpro.bean.DaoMaster;
 import com.wzy.lamanpro.bean.DaoSession;
+import com.wzy.lamanpro.bean.HisData;
+import com.wzy.lamanpro.bean.HisDataDao;
 import com.wzy.lamanpro.bean.ProductData;
 import com.wzy.lamanpro.bean.ProductDataDao;
 import com.wzy.lamanpro.bean.Users;
@@ -119,5 +121,13 @@ public class DataDaoUtils {
      */
     public void deleteUser(ProductData productData) {
         productDataDao.delete(productData);
+    }
+
+    /**
+     * 删除数据
+     */
+    public void deleteUser(Long id) {
+        QueryBuilder<ProductData> qb = productDataDao.queryBuilder();
+        qb.where(ProductDataDao.Properties.Id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
     }
 }

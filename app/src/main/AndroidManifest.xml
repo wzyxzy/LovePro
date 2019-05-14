@@ -31,6 +31,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".activity.DataDetails"
+            android:label="@string/title_activity_data_details"
+            android:parentActivityName=".activity.ManageData">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.wzy.lamanpro.activity.ManageData" />
+        </activity>
+        <activity
             android:name=".activity.HisDetails"
             android:label="@string/title_activity_his_details"
             android:parentActivityName=".activity.ManageHis">

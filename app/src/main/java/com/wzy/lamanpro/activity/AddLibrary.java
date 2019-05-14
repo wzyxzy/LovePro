@@ -1,8 +1,10 @@
 package com.wzy.lamanpro.activity;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
@@ -10,6 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -17,18 +21,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.wzy.lamanpro.R;
+import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.common.LaManApplication;
+import com.wzy.lamanpro.dao.HisDaoUtils;
+import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -238,6 +248,26 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                 } else {
                     Toast.makeText(AddLibrary.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case R.id.fab:
+                Snackbar.make(v, "点击此处可以保存数据库，是否要保存？", Snackbar.LENGTH_LONG)
+                        .setAction("保存", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (finalsResults == null || finalsResults.length == 0) {
+                                    Toast.makeText(AddLibrary.this, "还没有测试数据，请先测试！", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                StringBuffer stringBuffer = new StringBuffer();
+                                for (float finalsResult : finalsResults) {
+                                    stringBuffer.append(finalsResult + ",");
+                                }
+                                Intent intent = new Intent(AddLibrary.this, DataDetails.class);
+                                intent.putExtra("id", -2);
+                                intent.putExtra("results", stringBuffer.toString());
+                                startActivity(intent);
+                            }
+                        }).show();
                 break;
         }
     }

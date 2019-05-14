@@ -105,4 +105,5 @@
     <string name="title_activity_manage_his">测试数据管理</string>
     <string name="title_activity_add_library">建库</string>
     <string name="title_activity_his_details">测试数据</string>
+    <string name="title_activity_data_details">数据库管理</string>
 </resources>
