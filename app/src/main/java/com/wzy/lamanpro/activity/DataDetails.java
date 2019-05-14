@@ -51,7 +51,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
 
     private void initData() {
         id = getIntent().getLongExtra("id", -1);
-        if (id == -2) {
+        if (id == -1) {
             results = getIntent().getStringExtra("results");
             title_name.setText("建库");
             productData = new ProductData("", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
@@ -112,7 +112,8 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         new AlertDialog.Builder(this).setMessage("您要保存修改的数据吗？").setTitle("特别提示").setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (id == -2) {
+                if (id == -1) {
+                    productData.setData(results);
                     new DataDaoUtils(DataDetails.this).insertProductList(productData);
                 } else {
                     new DataDaoUtils(DataDetails.this).updateData(productData);
