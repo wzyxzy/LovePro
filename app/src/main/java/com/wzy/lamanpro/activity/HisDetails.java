@@ -25,7 +25,7 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
     private FloatingActionButton fab;
     private TextView title_name;
     private ListView allData;
-    private String id;
+    private Long id;
     private HisData hisData;
     private HisDataAdapter hisDataAdapter;
     private List<ListBean> listBeans;
@@ -43,8 +43,8 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
     }
 
     private void initData() {
-        id = getIntent().getStringExtra("id");
-        hisData = new HisDaoUtils(this).queryUser(Long.valueOf(id));
+        id = getIntent().getLongExtra("id", 0);
+        hisData = new HisDaoUtils(this).queryUser(id);
         title_name.setText(hisData.getName());
         listBeans = new ArrayList<>();
         listBeans.add(new ListBean("名字:", hisData.getName()));
@@ -71,7 +71,7 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
         title_name = (TextView) findViewById(R.id.title_name);
         title_name.setOnClickListener(this);
         allData = (ListView) findViewById(R.id.allData);
-        allData.setOnClickListener(this);
+//        allData.setOnClickListener(this);
         lineChart = (LineChart) findViewById(R.id.lineChart);
         lineChart.setOnClickListener(this);
     }

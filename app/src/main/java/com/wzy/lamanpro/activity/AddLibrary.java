@@ -263,7 +263,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                     stringBuffer.append(finalsResult + ",");
                                 }
                                 Intent intent = new Intent(AddLibrary.this, DataDetails.class);
-                                intent.putExtra("id", -2);
+                                intent.putExtra("id", -1);
                                 intent.putExtra("results", stringBuffer.toString());
                                 startActivity(intent);
                             }
