@@ -8,19 +8,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ListView;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.wzy.lamanpro.R;
-import com.wzy.lamanpro.adapter.DataDetailAdapter;
-import com.wzy.lamanpro.adapter.HisDataAdapter;
-import com.wzy.lamanpro.bean.ListBean;
 import com.wzy.lamanpro.bean.ProductData;
 import com.wzy.lamanpro.dao.DataDaoUtils;
-import com.wzy.lamanpro.dao.HisDaoUtils;
-import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
 
 import java.util.ArrayList;
@@ -31,14 +27,28 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private FloatingActionButton fab;
     private TextView title_name;
     private LineChart lineChart;
-    private ListView allData;
+    //    private ListView allData;
     private Long id;
     private String results;
     private ProductData productData;
-    private DataDetailAdapter dataDetailAdapter;
-    private List<ListBean> listBeans;
+    //    private DataDetailAdapter dataDetailAdapter;
+//    private List<ListBean> listBeans;
     List<String> xDataList = new ArrayList<>();// x轴数据源
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
+    private EditText product_name;
+    private EditText user_account;
+    private EditText user_company;
+    private EditText product_hs;
+    private EditText product_cas;
+    private EditText product_nfpa704;
+    private EditText dangerous_level;
+    private EditText dangerous_sign;
+    private EditText dangerous_transport;
+    private EditText product_mdl;
+    private EditText product_einecs;
+    private EditText product_rtecs;
+    private EditText product_brn;
+    private EditText product_detail;
 
 
     @Override
@@ -61,23 +71,6 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
             results = productData.getData();
         }
 
-        listBeans = new ArrayList<>();
-        listBeans.add(new ListBean("样品名称:", productData.getProName()));
-        listBeans.add(new ListBean("用户名:", productData.getUserName()));
-        listBeans.add(new ListBean("公司:", productData.getUserCompany()));
-        listBeans.add(new ListBean("HS码:", productData.getProHSCode()));
-        listBeans.add(new ListBean("CAS码:", productData.getProCASCode()));
-        listBeans.add(new ListBean("NFPA704标志:", productData.getProNFPA704Code()));
-        listBeans.add(new ListBean("危险等级:", productData.getProDangerLevel()));
-        listBeans.add(new ListBean("危险性符号:", productData.getProDangerClass()));
-        listBeans.add(new ListBean("危险运输编码:", productData.getProDangerTransportCode()));
-        listBeans.add(new ListBean("MDL号:", productData.getProMDLNumber()));
-        listBeans.add(new ListBean("EINECS号:", productData.getProEINECSNumber()));
-        listBeans.add(new ListBean("RTECS号:", productData.getProRTECSNumber()));
-        listBeans.add(new ListBean("BRN号:", productData.getProBRNNumber()));
-        listBeans.add(new ListBean("样品信息:", productData.getProDetail()));
-        dataDetailAdapter = new DataDetailAdapter(listBeans, this, R.layout.item_datas);
-        allData.setAdapter(dataDetailAdapter);
         String[] strings = results.split(",");
         for (int i = 0; i < strings.length; i++) {
             xDataList.add(String.valueOf(i));
@@ -94,7 +87,34 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         title_name.setOnClickListener(this);
         lineChart = (LineChart) findViewById(R.id.lineChart);
         lineChart.setOnClickListener(this);
-        allData = (ListView) findViewById(R.id.allData);
+        product_name = (EditText) findViewById(R.id.product_name);
+        product_name.setOnClickListener(this);
+        user_account = (EditText) findViewById(R.id.user_account);
+        user_account.setOnClickListener(this);
+        user_company = (EditText) findViewById(R.id.user_company);
+        user_company.setOnClickListener(this);
+        product_hs = (EditText) findViewById(R.id.product_hs);
+        product_hs.setOnClickListener(this);
+        product_cas = (EditText) findViewById(R.id.product_cas);
+        product_cas.setOnClickListener(this);
+        product_nfpa704 = (EditText) findViewById(R.id.product_nfpa704);
+        product_nfpa704.setOnClickListener(this);
+        dangerous_level = (EditText) findViewById(R.id.dangerous_level);
+        dangerous_level.setOnClickListener(this);
+        dangerous_sign = (EditText) findViewById(R.id.dangerous_sign);
+        dangerous_sign.setOnClickListener(this);
+        dangerous_transport = (EditText) findViewById(R.id.dangerous_transport);
+        dangerous_transport.setOnClickListener(this);
+        product_mdl = (EditText) findViewById(R.id.product_mdl);
+        product_mdl.setOnClickListener(this);
+        product_einecs = (EditText) findViewById(R.id.product_einecs);
+        product_einecs.setOnClickListener(this);
+        product_rtecs = (EditText) findViewById(R.id.product_rtecs);
+        product_rtecs.setOnClickListener(this);
+        product_brn = (EditText) findViewById(R.id.product_brn);
+        product_brn.setOnClickListener(this);
+        product_detail = (EditText) findViewById(R.id.product_detail);
+        product_detail.setOnClickListener(this);
     }
 
     @Override
@@ -121,5 +141,96 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
                 finish();
             }
         }).setNegativeButton("取消", null).create().show();
+    }
+
+    private void submit() {
+        // validate
+        String name = product_name.getText().toString().trim();
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(this, "样品名称", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String account = user_account.getText().toString().trim();
+        if (TextUtils.isEmpty(account)) {
+            Toast.makeText(this, "用户名", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String company = user_company.getText().toString().trim();
+        if (TextUtils.isEmpty(company)) {
+            Toast.makeText(this, "公司", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String hs = product_hs.getText().toString().trim();
+        if (TextUtils.isEmpty(hs)) {
+            Toast.makeText(this, "HS码", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String cas = product_cas.getText().toString().trim();
+        if (TextUtils.isEmpty(cas)) {
+            Toast.makeText(this, "CAS码", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String nfpa704 = product_nfpa704.getText().toString().trim();
+        if (TextUtils.isEmpty(nfpa704)) {
+            Toast.makeText(this, "NFPA704标志", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String level = dangerous_level.getText().toString().trim();
+        if (TextUtils.isEmpty(level)) {
+            Toast.makeText(this, "危险等级", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String sign = dangerous_sign.getText().toString().trim();
+        if (TextUtils.isEmpty(sign)) {
+            Toast.makeText(this, "危险性符号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String transport = dangerous_transport.getText().toString().trim();
+        if (TextUtils.isEmpty(transport)) {
+            Toast.makeText(this, "危险运输编码", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String mdl = product_mdl.getText().toString().trim();
+        if (TextUtils.isEmpty(mdl)) {
+            Toast.makeText(this, "MDL号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String einecs = product_einecs.getText().toString().trim();
+        if (TextUtils.isEmpty(einecs)) {
+            Toast.makeText(this, "EINECS号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String rtecs = product_rtecs.getText().toString().trim();
+        if (TextUtils.isEmpty(rtecs)) {
+            Toast.makeText(this, "RTECS号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String brn = product_brn.getText().toString().trim();
+        if (TextUtils.isEmpty(brn)) {
+            Toast.makeText(this, "BRN号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String detail = product_detail.getText().toString().trim();
+        if (TextUtils.isEmpty(detail)) {
+            Toast.makeText(this, "样品信息", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // TODO validate success, do something
+
+
     }
 }
