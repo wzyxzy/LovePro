@@ -1,6 +1,5 @@
 package com.wzy.lamanpro.activity;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,17 +10,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.wzy.lamanpro.R;
-import com.wzy.lamanpro.adapter.DataAdapter;
 import com.wzy.lamanpro.adapter.HisAdapter;
 import com.wzy.lamanpro.bean.HisData;
-import com.wzy.lamanpro.bean.ProductData;
-import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.dao.HisDaoUtils;
-import com.wzy.lamanpro.dao.UserDaoUtils;
-import com.wzy.lamanpro.utils.SPUtility;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class ManageHis extends AppCompatActivity {
