@@ -14,11 +14,11 @@
 
     <!-- This preference simply launches an intent when selected. Use this UI sparingly, per
          design guidelines. -->
-    <Preference android:title="拍照">
-        <intent android:action="MediaStore.ACTION_IMAGE_CAPTURE" />
+    <Preference android:title="声音设置">
+        <intent android:action="android.settings.SOUND_SETTINGS" />
     </Preference>
-    <Preference android:title="录像">
-        <intent android:action="MediaStore.ACTION_VIDEO_CAPTURE" />
+    <Preference android:title="显示设置">
+        <intent android:action="android.settings.DISPLAY_SETTINGS" />
     </Preference>
 
 </PreferenceScreen>

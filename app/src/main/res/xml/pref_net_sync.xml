@@ -14,11 +14,17 @@
 
     <!-- This preference simply launches an intent when selected. Use this UI sparingly, per
          design guidelines. -->
-    <Preference android:title="拍照">
-        <intent android:action="MediaStore.ACTION_IMAGE_CAPTURE" />
+    <Preference android:title="飞行模式设置">
+        <intent android:action="android.settings.AIRPLANE_MODE_SETTINGS" />
     </Preference>
-    <Preference android:title="录像">
-        <intent android:action="MediaStore.ACTION_VIDEO_CAPTURE" />
+    <Preference android:title="APN设置">
+        <intent android:action="android.settings.APN_SETTINGS" />
+    </Preference>
+    <Preference android:title="网络设置">
+        <intent android:action="android.settings.NETWORK_OPERATOR_SETTINGS" />
+    </Preference>
+    <Preference android:title="WIFI设置">
+        <intent android:action="android.settings.WIFI_SETTINGS" />
     </Preference>
 
 </PreferenceScreen>
