@@ -72,19 +72,6 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
         change.setOnClickListener(this);
         delete.setOnClickListener(this);
         account = (EditText) findViewById(R.id.account);
-        if (canEdit) {
-            name_text.setEnabled(true);
-            password.setEnabled(true);
-            account.setEnabled(true);
-            email.setEnabled(true);
-            pemission_level.setEnabled(true);
-        } else {
-            name_text.setEnabled(false);
-            password.setEnabled(false);
-            account.setEnabled(false);
-            email.setEnabled(false);
-            pemission_level.setEnabled(false);
-        }
     }
 
     @Override
@@ -133,7 +120,7 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
             builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (submit() && users != null) {
+                    if (submit()) {
                         if (TextUtils.isEmpty(account_)) {
                             new UserDaoUtils(UserDetails.this).insertUserList(users);
                             finish();

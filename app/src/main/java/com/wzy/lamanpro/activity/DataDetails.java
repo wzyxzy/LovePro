@@ -49,6 +49,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private EditText product_rtecs;
     private EditText product_brn;
     private EditText product_detail;
+    private boolean canEdit = false;
 
 
     @Override
@@ -59,16 +60,22 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         initData();
     }
 
+
     private void initData() {
         id = getIntent().getLongExtra("id", -1);
         if (id == -1) {
             results = getIntent().getStringExtra("results");
             title_name.setText("建库");
             productData = new ProductData("", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
+            canEdit = true;
+            checkEnabled();
         } else {
             productData = new DataDaoUtils(this).queryUser(Long.valueOf(id));
             title_name.setText(productData.getProName());
             results = productData.getData();
+            canEdit = false;
+            checkEnabled();
+
         }
 
         String[] strings = results.split(",");
@@ -77,6 +84,24 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
             yDataList.add(new Entry(Float.valueOf(strings[i]), i));
         }
         ChartUtil.showChart(this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+    }
+
+    private void checkEnabled() {
+        product_name.setEnabled(canEdit);
+        user_account.setEnabled(canEdit);
+        user_company.setEnabled(canEdit);
+        product_hs.setEnabled(canEdit);
+        product_cas.setEnabled(canEdit);
+        product_nfpa704.setEnabled(canEdit);
+        dangerous_level.setEnabled(canEdit);
+        dangerous_sign.setEnabled(canEdit);
+        dangerous_transport.setEnabled(canEdit);
+        product_mdl.setEnabled(canEdit);
+        product_einecs.setEnabled(canEdit);
+        product_rtecs.setEnabled(canEdit);
+        product_brn.setEnabled(canEdit);
+        product_detail.setEnabled(canEdit);
+
     }
 
     private void initView() {
@@ -121,116 +146,130 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(v, "点击可以对库数据进行修改，确认要修改吗", Snackbar.LENGTH_LONG)
+                        .setAction("确认", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                canEdit = true;
+                                checkEnabled();
+                            }
+                        }).show();
                 break;
         }
     }
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setMessage("您要保存修改的数据吗？").setTitle("特别提示").setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (id == -1) {
-                    productData.setData(results);
-                    new DataDaoUtils(DataDetails.this).insertProductList(productData);
-                } else {
-                    new DataDaoUtils(DataDetails.this).updateData(productData);
+        if (canEdit) {
+            new AlertDialog.Builder(this).setMessage("您要保存修改的数据吗？").setTitle("特别提示").setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (submit()) {
+                        if (id == -1) {
+                            productData.setData(results);
+                            new DataDaoUtils(DataDetails.this).insertProductList(productData);
+                        } else {
+                            new DataDaoUtils(DataDetails.this).updateData(productData);
+                        }
+                        finish();
+                    }
+
                 }
-                finish();
-            }
-        }).setNegativeButton("取消", null).create().show();
+            }).setNegativeButton("取消", null).create().show();
+        } else {
+            super.onBackPressed();
+        }
+
     }
 
-    private void submit() {
+    private boolean submit() {
         // validate
         String name = product_name.getText().toString().trim();
         if (TextUtils.isEmpty(name)) {
-            Toast.makeText(this, "样品名称", Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(this, "样品名称不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }
+        productData.setProName(name);
+        productData.setUserName(user_account.getText().toString().trim());
+//        if (TextUtils.isEmpty(account)) {
+//            Toast.makeText(this, "用户名", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String account = user_account.getText().toString().trim();
-        if (TextUtils.isEmpty(account)) {
-            Toast.makeText(this, "用户名", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setUserCompany(user_company.getText().toString().trim());
+//        if (TextUtils.isEmpty(company)) {
+//            Toast.makeText(this, "公司", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String company = user_company.getText().toString().trim();
-        if (TextUtils.isEmpty(company)) {
-            Toast.makeText(this, "公司", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProHSCode(product_hs.getText().toString().trim());
+//        if (TextUtils.isEmpty(hs)) {
+//            Toast.makeText(this, "HS码", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String hs = product_hs.getText().toString().trim();
-        if (TextUtils.isEmpty(hs)) {
-            Toast.makeText(this, "HS码", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProCASCode(product_cas.getText().toString().trim());
+//        if (TextUtils.isEmpty(cas)) {
+//            Toast.makeText(this, "CAS码", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String cas = product_cas.getText().toString().trim();
-        if (TextUtils.isEmpty(cas)) {
-            Toast.makeText(this, "CAS码", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProNFPA704Code(product_nfpa704.getText().toString().trim());
+//        if (TextUtils.isEmpty(nfpa704)) {
+//            Toast.makeText(this, "NFPA704标志", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String nfpa704 = product_nfpa704.getText().toString().trim();
-        if (TextUtils.isEmpty(nfpa704)) {
-            Toast.makeText(this, "NFPA704标志", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProDangerLevel(dangerous_level.getText().toString().trim());
+//        if (TextUtils.isEmpty(level)) {
+//            Toast.makeText(this, "危险等级", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String level = dangerous_level.getText().toString().trim();
-        if (TextUtils.isEmpty(level)) {
-            Toast.makeText(this, "危险等级", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProDangerClass(dangerous_sign.getText().toString().trim());
+//        if (TextUtils.isEmpty(sign)) {
+//            Toast.makeText(this, "危险性符号", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String sign = dangerous_sign.getText().toString().trim();
-        if (TextUtils.isEmpty(sign)) {
-            Toast.makeText(this, "危险性符号", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProDangerTransportCode(dangerous_transport.getText().toString().trim());
+//        if (TextUtils.isEmpty(transport)) {
+//            Toast.makeText(this, "危险运输编码", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String transport = dangerous_transport.getText().toString().trim();
-        if (TextUtils.isEmpty(transport)) {
-            Toast.makeText(this, "危险运输编码", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProMDLNumber(product_mdl.getText().toString().trim());
+//        if (TextUtils.isEmpty(mdl)) {
+//            Toast.makeText(this, "MDL号", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String mdl = product_mdl.getText().toString().trim();
-        if (TextUtils.isEmpty(mdl)) {
-            Toast.makeText(this, "MDL号", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProEINECSNumber(product_einecs.getText().toString().trim());
+//        if (TextUtils.isEmpty(einecs)) {
+//            Toast.makeText(this, "EINECS号", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String einecs = product_einecs.getText().toString().trim();
-        if (TextUtils.isEmpty(einecs)) {
-            Toast.makeText(this, "EINECS号", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProRTECSNumber(product_rtecs.getText().toString().trim());
+//        if (TextUtils.isEmpty(rtecs)) {
+//            Toast.makeText(this, "RTECS号", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String rtecs = product_rtecs.getText().toString().trim();
-        if (TextUtils.isEmpty(rtecs)) {
-            Toast.makeText(this, "RTECS号", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProBRNNumber(product_brn.getText().toString().trim());
+//        if (TextUtils.isEmpty(brn)) {
+//            Toast.makeText(this, "BRN号", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-        String brn = product_brn.getText().toString().trim();
-        if (TextUtils.isEmpty(brn)) {
-            Toast.makeText(this, "BRN号", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String detail = product_detail.getText().toString().trim();
-        if (TextUtils.isEmpty(detail)) {
-            Toast.makeText(this, "样品信息", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        productData.setProDetail(product_detail.getText().toString().trim());
+//        if (TextUtils.isEmpty(detail)) {
+//            Toast.makeText(this, "样品信息", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
         // TODO validate success, do something
-
+        return true;
 
     }
 }
