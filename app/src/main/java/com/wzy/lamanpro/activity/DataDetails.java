@@ -19,8 +19,10 @@ import com.wzy.lamanpro.bean.ProductData;
 import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DataDetails extends AppCompatActivity implements View.OnClickListener {
 
@@ -50,6 +52,8 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private EditText product_brn;
     private EditText product_detail;
     private boolean canEdit = false;
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
+
 
 
     @Override
@@ -66,7 +70,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         if (id == -1) {
             results = getIntent().getStringExtra("results");
             title_name.setText("建库");
-            productData = new ProductData("", "", "", "", "", "", "", "", "", "", "", "", "", "", "");
+            productData = new ProductData("", "", "此处需要回去改", "", "", "", "", "", "","", "", "", "", "","","");
             canEdit = true;
             checkEnabled();
         } else {

@@ -13,7 +13,7 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
     greendao {
-        schemaVersion 6
+        schemaVersion 8
         targetGenDir 'src/main/java'
     }
     buildTypes {

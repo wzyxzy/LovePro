@@ -167,7 +167,7 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
                                         List<ProductData> productDataNew = new ArrayList<>();
                                         for (ProductData productDatum : productData) {
                                             try {
-                                                long datePro = format.parse(productDatum.getData()).getTime();
+                                                long datePro = format.parse(productDatum.getDate()).getTime();
                                                 if (productDatum.getProName().contains(name) && format.parse(timeFromText).getTime() <= datePro && datePro <= format.parse(timeToText).getTime()) {
                                                     productDataNew.add(productDatum);
                                                 }

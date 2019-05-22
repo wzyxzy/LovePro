@@ -25,19 +25,20 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property ProName = new Property(1, String.class, "proName", false, "PRO_NAME");
         public final static Property Data = new Property(2, String.class, "data", false, "DATA");
-        public final static Property UserName = new Property(3, String.class, "userName", false, "USER_NAME");
-        public final static Property UserCompany = new Property(4, String.class, "userCompany", false, "USER_COMPANY");
-        public final static Property ProHSCode = new Property(5, String.class, "proHSCode", false, "PRO_HSCODE");
-        public final static Property ProCASCode = new Property(6, String.class, "proCASCode", false, "PRO_CASCODE");
-        public final static Property ProNFPA704Code = new Property(7, String.class, "proNFPA704Code", false, "PRO_NFPA704_CODE");
-        public final static Property ProDangerLevel = new Property(8, String.class, "proDangerLevel", false, "PRO_DANGER_LEVEL");
-        public final static Property ProDangerClass = new Property(9, String.class, "proDangerClass", false, "PRO_DANGER_CLASS");
-        public final static Property ProDangerTransportCode = new Property(10, String.class, "proDangerTransportCode", false, "PRO_DANGER_TRANSPORT_CODE");
-        public final static Property ProMDLNumber = new Property(11, String.class, "proMDLNumber", false, "PRO_MDLNUMBER");
-        public final static Property ProEINECSNumber = new Property(12, String.class, "proEINECSNumber", false, "PRO_EINECSNUMBER");
-        public final static Property ProRTECSNumber = new Property(13, String.class, "proRTECSNumber", false, "PRO_RTECSNUMBER");
-        public final static Property ProBRNNumber = new Property(14, String.class, "proBRNNumber", false, "PRO_BRNNUMBER");
-        public final static Property ProDetail = new Property(15, String.class, "proDetail", false, "PRO_DETAIL");
+        public final static Property Date = new Property(3, String.class, "date", false, "DATE");
+        public final static Property UserName = new Property(4, String.class, "userName", false, "USER_NAME");
+        public final static Property UserCompany = new Property(5, String.class, "userCompany", false, "USER_COMPANY");
+        public final static Property ProHSCode = new Property(6, String.class, "proHSCode", false, "PRO_HSCODE");
+        public final static Property ProCASCode = new Property(7, String.class, "proCASCode", false, "PRO_CASCODE");
+        public final static Property ProNFPA704Code = new Property(8, String.class, "proNFPA704Code", false, "PRO_NFPA704_CODE");
+        public final static Property ProDangerLevel = new Property(9, String.class, "proDangerLevel", false, "PRO_DANGER_LEVEL");
+        public final static Property ProDangerClass = new Property(10, String.class, "proDangerClass", false, "PRO_DANGER_CLASS");
+        public final static Property ProDangerTransportCode = new Property(11, String.class, "proDangerTransportCode", false, "PRO_DANGER_TRANSPORT_CODE");
+        public final static Property ProMDLNumber = new Property(12, String.class, "proMDLNumber", false, "PRO_MDLNUMBER");
+        public final static Property ProEINECSNumber = new Property(13, String.class, "proEINECSNumber", false, "PRO_EINECSNUMBER");
+        public final static Property ProRTECSNumber = new Property(14, String.class, "proRTECSNumber", false, "PRO_RTECSNUMBER");
+        public final static Property ProBRNNumber = new Property(15, String.class, "proBRNNumber", false, "PRO_BRNNUMBER");
+        public final static Property ProDetail = new Property(16, String.class, "proDetail", false, "PRO_DETAIL");
     }
 
 
@@ -56,19 +57,20 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"PRO_NAME\" TEXT," + // 1: proName
                 "\"DATA\" TEXT," + // 2: data
-                "\"USER_NAME\" TEXT," + // 3: userName
-                "\"USER_COMPANY\" TEXT," + // 4: userCompany
-                "\"PRO_HSCODE\" TEXT," + // 5: proHSCode
-                "\"PRO_CASCODE\" TEXT," + // 6: proCASCode
-                "\"PRO_NFPA704_CODE\" TEXT," + // 7: proNFPA704Code
-                "\"PRO_DANGER_LEVEL\" TEXT," + // 8: proDangerLevel
-                "\"PRO_DANGER_CLASS\" TEXT," + // 9: proDangerClass
-                "\"PRO_DANGER_TRANSPORT_CODE\" TEXT," + // 10: proDangerTransportCode
-                "\"PRO_MDLNUMBER\" TEXT," + // 11: proMDLNumber
-                "\"PRO_EINECSNUMBER\" TEXT," + // 12: proEINECSNumber
-                "\"PRO_RTECSNUMBER\" TEXT," + // 13: proRTECSNumber
-                "\"PRO_BRNNUMBER\" TEXT," + // 14: proBRNNumber
-                "\"PRO_DETAIL\" TEXT);"); // 15: proDetail
+                "\"DATE\" TEXT," + // 3: date
+                "\"USER_NAME\" TEXT," + // 4: userName
+                "\"USER_COMPANY\" TEXT," + // 5: userCompany
+                "\"PRO_HSCODE\" TEXT," + // 6: proHSCode
+                "\"PRO_CASCODE\" TEXT," + // 7: proCASCode
+                "\"PRO_NFPA704_CODE\" TEXT," + // 8: proNFPA704Code
+                "\"PRO_DANGER_LEVEL\" TEXT," + // 9: proDangerLevel
+                "\"PRO_DANGER_CLASS\" TEXT," + // 10: proDangerClass
+                "\"PRO_DANGER_TRANSPORT_CODE\" TEXT," + // 11: proDangerTransportCode
+                "\"PRO_MDLNUMBER\" TEXT," + // 12: proMDLNumber
+                "\"PRO_EINECSNUMBER\" TEXT," + // 13: proEINECSNumber
+                "\"PRO_RTECSNUMBER\" TEXT," + // 14: proRTECSNumber
+                "\"PRO_BRNNUMBER\" TEXT," + // 15: proBRNNumber
+                "\"PRO_DETAIL\" TEXT);"); // 16: proDetail
     }
 
     /** Drops the underlying database table. */
@@ -96,69 +98,74 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
             stmt.bindString(3, data);
         }
  
+        String date = entity.getDate();
+        if (date != null) {
+            stmt.bindString(4, date);
+        }
+ 
         String userName = entity.getUserName();
         if (userName != null) {
-            stmt.bindString(4, userName);
+            stmt.bindString(5, userName);
         }
  
         String userCompany = entity.getUserCompany();
         if (userCompany != null) {
-            stmt.bindString(5, userCompany);
+            stmt.bindString(6, userCompany);
         }
  
         String proHSCode = entity.getProHSCode();
         if (proHSCode != null) {
-            stmt.bindString(6, proHSCode);
+            stmt.bindString(7, proHSCode);
         }
  
         String proCASCode = entity.getProCASCode();
         if (proCASCode != null) {
-            stmt.bindString(7, proCASCode);
+            stmt.bindString(8, proCASCode);
         }
  
         String proNFPA704Code = entity.getProNFPA704Code();
         if (proNFPA704Code != null) {
-            stmt.bindString(8, proNFPA704Code);
+            stmt.bindString(9, proNFPA704Code);
         }
  
         String proDangerLevel = entity.getProDangerLevel();
         if (proDangerLevel != null) {
-            stmt.bindString(9, proDangerLevel);
+            stmt.bindString(10, proDangerLevel);
         }
  
         String proDangerClass = entity.getProDangerClass();
         if (proDangerClass != null) {
-            stmt.bindString(10, proDangerClass);
+            stmt.bindString(11, proDangerClass);
         }
  
         String proDangerTransportCode = entity.getProDangerTransportCode();
         if (proDangerTransportCode != null) {
-            stmt.bindString(11, proDangerTransportCode);
+            stmt.bindString(12, proDangerTransportCode);
         }
  
         String proMDLNumber = entity.getProMDLNumber();
         if (proMDLNumber != null) {
-            stmt.bindString(12, proMDLNumber);
+            stmt.bindString(13, proMDLNumber);
         }
  
         String proEINECSNumber = entity.getProEINECSNumber();
         if (proEINECSNumber != null) {
-            stmt.bindString(13, proEINECSNumber);
+            stmt.bindString(14, proEINECSNumber);
         }
  
         String proRTECSNumber = entity.getProRTECSNumber();
         if (proRTECSNumber != null) {
-            stmt.bindString(14, proRTECSNumber);
+            stmt.bindString(15, proRTECSNumber);
         }
  
         String proBRNNumber = entity.getProBRNNumber();
         if (proBRNNumber != null) {
-            stmt.bindString(15, proBRNNumber);
+            stmt.bindString(16, proBRNNumber);
         }
  
         String proDetail = entity.getProDetail();
         if (proDetail != null) {
-            stmt.bindString(16, proDetail);
+            stmt.bindString(17, proDetail);
         }
     }
 
@@ -181,69 +188,74 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
             stmt.bindString(3, data);
         }
  
+        String date = entity.getDate();
+        if (date != null) {
+            stmt.bindString(4, date);
+        }
+ 
         String userName = entity.getUserName();
         if (userName != null) {
-            stmt.bindString(4, userName);
+            stmt.bindString(5, userName);
         }
  
         String userCompany = entity.getUserCompany();
         if (userCompany != null) {
-            stmt.bindString(5, userCompany);
+            stmt.bindString(6, userCompany);
         }
  
         String proHSCode = entity.getProHSCode();
         if (proHSCode != null) {
-            stmt.bindString(6, proHSCode);
+            stmt.bindString(7, proHSCode);
         }
  
         String proCASCode = entity.getProCASCode();
         if (proCASCode != null) {
-            stmt.bindString(7, proCASCode);
+            stmt.bindString(8, proCASCode);
         }
  
         String proNFPA704Code = entity.getProNFPA704Code();
         if (proNFPA704Code != null) {
-            stmt.bindString(8, proNFPA704Code);
+            stmt.bindString(9, proNFPA704Code);
         }
  
         String proDangerLevel = entity.getProDangerLevel();
         if (proDangerLevel != null) {
-            stmt.bindString(9, proDangerLevel);
+            stmt.bindString(10, proDangerLevel);
         }
  
         String proDangerClass = entity.getProDangerClass();
         if (proDangerClass != null) {
-            stmt.bindString(10, proDangerClass);
+            stmt.bindString(11, proDangerClass);
         }
  
         String proDangerTransportCode = entity.getProDangerTransportCode();
         if (proDangerTransportCode != null) {
-            stmt.bindString(11, proDangerTransportCode);
+            stmt.bindString(12, proDangerTransportCode);
         }
  
         String proMDLNumber = entity.getProMDLNumber();
         if (proMDLNumber != null) {
-            stmt.bindString(12, proMDLNumber);
+            stmt.bindString(13, proMDLNumber);
         }
  
         String proEINECSNumber = entity.getProEINECSNumber();
         if (proEINECSNumber != null) {
-            stmt.bindString(13, proEINECSNumber);
+            stmt.bindString(14, proEINECSNumber);
         }
  
         String proRTECSNumber = entity.getProRTECSNumber();
         if (proRTECSNumber != null) {
-            stmt.bindString(14, proRTECSNumber);
+            stmt.bindString(15, proRTECSNumber);
         }
  
         String proBRNNumber = entity.getProBRNNumber();
         if (proBRNNumber != null) {
-            stmt.bindString(15, proBRNNumber);
+            stmt.bindString(16, proBRNNumber);
         }
  
         String proDetail = entity.getProDetail();
         if (proDetail != null) {
-            stmt.bindString(16, proDetail);
+            stmt.bindString(17, proDetail);
         }
     }
 
@@ -258,19 +270,20 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // proName
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // data
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // userName
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // userCompany
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // proHSCode
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // proCASCode
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // proNFPA704Code
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // proDangerLevel
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // proDangerClass
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // proDangerTransportCode
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // proMDLNumber
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // proEINECSNumber
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // proRTECSNumber
-            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // proBRNNumber
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15) // proDetail
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // date
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // userName
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // userCompany
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // proHSCode
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // proCASCode
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // proNFPA704Code
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // proDangerLevel
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // proDangerClass
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // proDangerTransportCode
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // proMDLNumber
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // proEINECSNumber
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // proRTECSNumber
+            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // proBRNNumber
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16) // proDetail
         );
         return entity;
     }
@@ -280,19 +293,20 @@ public class ProductDataDao extends AbstractDao<ProductData, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setProName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setData(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setUserName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setUserCompany(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setProHSCode(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setProCASCode(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setProNFPA704Code(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setProDangerLevel(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setProDangerClass(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setProDangerTransportCode(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setProMDLNumber(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setProEINECSNumber(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setProRTECSNumber(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setProBRNNumber(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
-        entity.setProDetail(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setDate(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setUserName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setUserCompany(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setProHSCode(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setProCASCode(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setProNFPA704Code(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setProDangerLevel(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setProDangerClass(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setProDangerTransportCode(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setProMDLNumber(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setProEINECSNumber(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setProRTECSNumber(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setProBRNNumber(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
+        entity.setProDetail(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
      }
     
     @Override

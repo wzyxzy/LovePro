@@ -10,6 +10,7 @@ public class ProductData {
     private Long id;//编号
     private String proName;//样品名称
     private String data;//数据
+    private String date;//日期
     private String userName;//用户名
     private String userCompany;//公司
     private String proHSCode;//HS码
@@ -24,16 +25,10 @@ public class ProductData {
     private String proBRNNumber;//BRN号
     private String proDetail;//样品信息
 
-    @Generated(hash = 214137623)
-    public ProductData(Long id, String proName, String data, String userName,
-                       String userCompany, String proHSCode, String proCASCode,
-                       String proNFPA704Code, String proDangerLevel, String proDangerClass,
-                       String proDangerTransportCode, String proMDLNumber,
-                       String proEINECSNumber, String proRTECSNumber, String proBRNNumber,
-                       String proDetail) {
-        this.id = id;
+    public ProductData(String proName, String data, String date, String userName, String userCompany, String proHSCode, String proCASCode, String proNFPA704Code, String proDangerLevel, String proDangerClass, String proDangerTransportCode, String proMDLNumber, String proEINECSNumber, String proRTECSNumber, String proBRNNumber, String proDetail) {
         this.proName = proName;
         this.data = data;
+        this.date = date;
         this.userName = userName;
         this.userCompany = userCompany;
         this.proHSCode = proHSCode;
@@ -49,9 +44,17 @@ public class ProductData {
         this.proDetail = proDetail;
     }
 
-    public ProductData(String proName, String data, String userName, String userCompany, String proHSCode, String proCASCode, String proNFPA704Code, String proDangerLevel, String proDangerClass, String proDangerTransportCode, String proMDLNumber, String proEINECSNumber, String proRTECSNumber, String proBRNNumber, String proDetail) {
+    @Generated(hash = 251337539)
+    public ProductData(Long id, String proName, String data, String date,
+                       String userName, String userCompany, String proHSCode,
+                       String proCASCode, String proNFPA704Code, String proDangerLevel,
+                       String proDangerClass, String proDangerTransportCode,
+                       String proMDLNumber, String proEINECSNumber, String proRTECSNumber,
+                       String proBRNNumber, String proDetail) {
+        this.id = id;
         this.proName = proName;
         this.data = data;
+        this.date = date;
         this.userName = userName;
         this.userCompany = userCompany;
         this.proHSCode = proHSCode;
@@ -93,6 +96,14 @@ public class ProductData {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public String getDate() {
+        return this.date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getUserName() {
@@ -198,5 +209,6 @@ public class ProductData {
     public void setProDetail(String proDetail) {
         this.proDetail = proDetail;
     }
+
 
 }
