@@ -21,6 +21,7 @@ import com.wzy.lamanpro.utils.ChartUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,7 +56,6 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +70,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         if (id == -1) {
             results = getIntent().getStringExtra("results");
             title_name.setText("建库");
-            productData = new ProductData("", "", "此处需要回去改", "", "", "", "", "", "","", "", "", "", "","","");
+            productData = new ProductData("", "", format.format(new Date()), "", "", "", "", "", "", "", "", "", "", "", "", "");
             canEdit = true;
             checkEnabled();
         } else {
