@@ -77,6 +77,20 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
             productData = new DataDaoUtils(this).queryUser(Long.valueOf(id));
             title_name.setText(productData.getProName());
             results = productData.getData();
+            product_name.setText(productData.getProName());
+            user_account.setText(productData.getUserName());
+            user_company.setText(productData.getUserCompany());
+            product_hs.setText(productData.getProHSCode());
+            product_cas.setText(productData.getProCASCode());
+            product_nfpa704.setText(productData.getProNFPA704Code());
+            dangerous_level.setText(productData.getProDangerLevel());
+            dangerous_sign.setText(productData.getProDangerClass());
+            dangerous_transport.setText(productData.getProDangerTransportCode());
+            product_mdl.setText(productData.getProMDLNumber());
+            product_einecs.setText(productData.getProEINECSNumber());
+            product_rtecs.setText(productData.getProRTECSNumber());
+            product_brn.setText(productData.getProBRNNumber());
+            product_detail.setText(productData.getProDetail());
             canEdit = false;
             checkEnabled();
 

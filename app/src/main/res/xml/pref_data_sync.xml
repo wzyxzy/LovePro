@@ -15,10 +15,10 @@
     <!-- This preference simply launches an intent when selected. Use this UI sparingly, per
          design guidelines. -->
     <Preference android:title="拍照">
-        <intent android:action="MediaStore.ACTION_IMAGE_CAPTURE" />
+        <intent android:action="android.media.action.IMAGE_CAPTURE" />
     </Preference>
     <Preference android:title="录像">
-        <intent android:action="MediaStore.ACTION_VIDEO_CAPTURE" />
+        <intent android:action="android.media.action.VIDEO_CAPTURE" />
     </Preference>
 
 </PreferenceScreen>
