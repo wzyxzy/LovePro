@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.INTERNET" /> <!-- 两种provider的权限 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 仅网络定位的权限 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- <uses-permission android:name="android.permission.SHUTDOWN" -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- tools:ignore="ProtectedPermissions" /> -->
     <uses-permission
         android:name="android.permission.HARDWARE_TEST"

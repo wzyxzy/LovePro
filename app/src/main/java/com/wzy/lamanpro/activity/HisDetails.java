@@ -1,12 +1,16 @@
 package com.wzy.lamanpro.activity;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -16,8 +20,11 @@ import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.bean.ListBean;
 import com.wzy.lamanpro.dao.HisDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
+import com.wzy.lamanpro.utils.PdfManager;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class HisDetails extends AppCompatActivity implements View.OnClickListener {
@@ -32,6 +39,7 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
     private LineChart lineChart;
     List<String> xDataList = new ArrayList<>();// x轴数据源
     List<Entry> yDataList = new ArrayList<Entry>();// y轴数据数据源
+    private ConstraintLayout view_pdf;
 
 
     @Override
@@ -74,14 +82,25 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
 //        allData.setOnClickListener(this);
         lineChart = (LineChart) findViewById(R.id.lineChart);
         lineChart.setOnClickListener(this);
+        view_pdf = (ConstraintLayout) findViewById(R.id.view_pdf);
+        view_pdf.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                Snackbar.make(v, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(v, "您确定要生成测试报告吗？", Snackbar.LENGTH_LONG)
+                        .setAction("确定", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                    String path = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试报告-" + new Date().getTime() + ".pdf";
+                                    PdfManager.makeViewEveryPdf(new View[]{view_pdf}, path);
+                                    Toast.makeText(HisDetails.this, "文件已经保存在:" + path, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).show();
                 break;
         }
     }
