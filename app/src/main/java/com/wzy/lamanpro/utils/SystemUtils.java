@@ -1,11 +1,22 @@
 package com.wzy.lamanpro.utils;
 
+import android.content.Context;
+import android.content.Intent;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+
 /**
  * SystemUtils
  *
  * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-5-15
  */
 public class SystemUtils {
+
+    private static final String ROOTNAME = "su";
 
     /**
      * recommend default thread pool size according to system available processors, {@link #getDefaultThreadPoolSize()}
@@ -35,5 +46,51 @@ public class SystemUtils {
     public static int getDefaultThreadPoolSize(int max) {
         int availableProcessors = 2 * Runtime.getRuntime().availableProcessors() + 1;
         return availableProcessors > max ? max : availableProcessors;
+    }
+
+    public static void shutDowm() {
+//        runAsRooter();
+        execCmd("reboot -p");
+
+
+    }
+
+//    private static void runAsRooter()
+//    {
+//        try {
+//            Process process = Runtime.getRuntime().exec("su");
+//            process.waitFor();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+
+    private static void execCmd(String command) {
+        Process process = null;
+        DataOutputStream os = null;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes(command+"\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+                if(process != null) {
+                    process.destroy();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

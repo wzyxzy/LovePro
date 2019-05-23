@@ -1,5 +1,6 @@
 package com.wzy.lamanpro.activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
 
 public class DataDetails extends AppCompatActivity implements View.OnClickListener {
 
@@ -54,6 +57,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private EditText product_detail;
     private boolean canEdit = false;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
+
 
 
     @Override
@@ -122,10 +126,16 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
 
     }
 
+    @SuppressLint("RestrictedApi")
     private void initView() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+        if (!isManager) {
+            fab.setVisibility(View.GONE);
+        } else {
+            fab.setVisibility(View.GONE);
+        }
         title_name = (TextView) findViewById(R.id.title_name);
         title_name.setOnClickListener(this);
         lineChart = (LineChart) findViewById(R.id.lineChart);

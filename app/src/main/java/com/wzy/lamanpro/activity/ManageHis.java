@@ -16,6 +16,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.adapter.HisAdapter;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
 
 public class ManageHis extends AppCompatActivity implements View.OnClickListener {
 
@@ -58,6 +61,10 @@ public class ManageHis extends AppCompatActivity implements View.OnClickListener
                 startActivity(intent);
             }
         });
+
+        if (!isManager) {
+            return;
+        }
         hisList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, final long id) {
@@ -94,7 +101,7 @@ public class ManageHis extends AppCompatActivity implements View.OnClickListener
     }
 
     //选择日期
-    private void showCalendar(final TextView editText) {
+    private void showCalendar(final TextView editText, final int type) {
         Calendar c = Calendar.getInstance();
         new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -116,7 +123,11 @@ public class ManageHis extends AppCompatActivity implements View.OnClickListener
                                     + "/" + dayOfMonth);
                         }
 
-                        editText.append(" 00:00:00");
+                        if (type == 0)
+                            editText.append(" 00:00:00");
+                        else
+                            editText.append(" 23:59:59");
+
 
                     }
                 }
@@ -139,14 +150,14 @@ public class ManageHis extends AppCompatActivity implements View.OnClickListener
                                 timeFrom.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        showCalendar(timeFrom);
+                                        showCalendar(timeFrom, 0);
                                     }
                                 });
                                 final TextView timeTo = view.findViewById(R.id.time_to);
                                 timeTo.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        showCalendar(timeTo);
+                                        showCalendar(timeTo, 1);
                                     }
                                 });
                                 new AlertDialog.Builder(ManageHis.this).setView(view).setTitle("条件查询").setPositiveButton("确认", new DialogInterface.OnClickListener() {

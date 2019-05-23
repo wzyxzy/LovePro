@@ -26,6 +26,8 @@ import com.wzy.lamanpro.utils.SPUtility;
 
 import java.util.logging.Logger;
 
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -231,6 +233,7 @@ public class LoginActivity extends CommonActivity {
                     SPUtility.putSPBoolean(LoginActivity.this, "isAutoLogin", checkbox.isChecked());
                     SPUtility.setUserId(LoginActivity.this, mAccount);
                     SPUtility.putSPString(LoginActivity.this, "password", mPassword);
+                    isManager = userDaoUtils.queryUser(mAccount).getLevel() == 1;
                     finish();
                     Intent intent = new Intent(LoginActivity.this, Main2Activity.class);
                     startActivity(intent);

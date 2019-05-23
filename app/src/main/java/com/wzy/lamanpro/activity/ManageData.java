@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
+
 public class ManageData extends AppCompatActivity implements View.OnClickListener {
 
     private ListView dataList;
@@ -66,6 +68,10 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
                 startActivity(intent);
             }
         });
+
+        if (!isManager) {
+            return;
+        }
         dataList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, final long id) {
@@ -101,7 +107,7 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
     }
 
     //选择日期
-    private void showCalendar(final TextView editText) {
+    private void showCalendar(final TextView editText, final int type) {
         Calendar c = Calendar.getInstance();
         new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
@@ -123,7 +129,11 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
                                     + "/" + dayOfMonth);
                         }
 
-                        editText.append(" 00:00:00");
+                        if (type == 0)
+                            editText.append(" 00:00:00");
+                        else
+                            editText.append(" 23:59:59");
+
 
                     }
                 }
@@ -147,14 +157,14 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
                                 timeFrom.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        showCalendar(timeFrom);
+                                        showCalendar(timeFrom, 0);
                                     }
                                 });
                                 final TextView timeTo = view.findViewById(R.id.time_to);
                                 timeTo.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        showCalendar(timeTo);
+                                        showCalendar(timeTo, 1);
                                     }
                                 });
                                 new AlertDialog.Builder(ManageData.this).setView(view).setTitle("条件查询").setPositiveButton("确认", new DialogInterface.OnClickListener() {
