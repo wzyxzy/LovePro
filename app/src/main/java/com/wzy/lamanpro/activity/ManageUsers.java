@@ -19,6 +19,8 @@ import com.wzy.lamanpro.dao.UserDaoUtils;
 
 import java.util.List;
 
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
+
 public class ManageUsers extends AppCompatActivity implements View.OnClickListener {
 
     //    private Toolbar toolbar;
@@ -74,9 +76,14 @@ public class ManageUsers extends AppCompatActivity implements View.OnClickListen
                         .setAction("添加", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(ManageUsers.this, UserDetails.class);
-                                intent.putExtra("account", "");
-                                startActivity(intent);
+                                if (isManager) {
+                                    Intent intent = new Intent(ManageUsers.this, UserDetails.class);
+                                    intent.putExtra("account", "");
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(ManageUsers.this, "您不是管理员，不可以添加用户！", Toast.LENGTH_SHORT).show();
+                                }
+
                             }
                         }).show();
                 break;

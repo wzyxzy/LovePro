@@ -49,6 +49,7 @@ import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
 import com.wzy.lamanpro.utils.PermissionGetting;
 import com.wzy.lamanpro.utils.SPUtility;
+import com.wzy.lamanpro.utils.SystemUtils;
 import com.wzy.lamanpro.utils.UsbUtils;
 
 import java.io.IOException;
@@ -210,6 +211,9 @@ public class Main2Activity extends AppCompatActivity
             case R.id.nav_logout:
                 showStyleDialog();
                 break;
+            case R.id.nav_shutdown:
+                SystemUtils.shutDowm();
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -302,13 +306,13 @@ public class Main2Activity extends AppCompatActivity
                 locationName = getLocationAddress(location);
                 stateText.append("位置是：" + locationName);
                 handler.sendEmptyMessage(2);
-            }
+            } else
 
-            //绑定定位事件，监听位置是否改变
-            //第一个参数为控制器类型第二个参数为监听位置变化的时间间隔（单位：毫秒）
-            //第三个参数为位置变化的间隔（单位：米）第四个参数为位置监听器
-            locationManager.requestLocationUpdates(provider, 2000, 2,
-                    locationListener);
+                //绑定定位事件，监听位置是否改变
+                //第一个参数为控制器类型第二个参数为监听位置变化的时间间隔（单位：毫秒）
+                //第三个参数为位置变化的间隔（单位：米）第四个参数为位置监听器
+                locationManager.requestLocationUpdates(provider, 2000, 2,
+                        locationListener);
         }
 
 

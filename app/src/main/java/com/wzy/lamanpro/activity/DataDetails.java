@@ -1,5 +1,6 @@
 package com.wzy.lamanpro.activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.wzy.lamanpro.common.LaManApplication.isManager;
 
 public class DataDetails extends AppCompatActivity implements View.OnClickListener {
 
@@ -55,7 +58,6 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +72,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         if (id == -1) {
             results = getIntent().getStringExtra("results");
             title_name.setText("建库");
-            productData = new ProductData("", "", "此处需要回去改", "", "", "", "", "", "","", "", "", "", "","","");
+            productData = new ProductData("", "", "此处需要回去改", "", "", "", "", "", "", "", "", "", "", "", "", "");
             canEdit = true;
             checkEnabled();
         } else {
@@ -122,10 +124,16 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
 
     }
 
+    @SuppressLint("RestrictedApi")
     private void initView() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
+        if (!isManager) {
+            fab.setVisibility(View.GONE);
+        } else {
+            fab.setVisibility(View.GONE);
+        }
         title_name = (TextView) findViewById(R.id.title_name);
         title_name.setOnClickListener(this);
         lineChart = (LineChart) findViewById(R.id.lineChart);
