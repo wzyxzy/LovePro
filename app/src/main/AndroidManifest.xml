@@ -26,9 +26,9 @@
     <application
         android:name=".common.LaManApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -113,7 +113,8 @@
         <activity android:name=".activity.MainActivity" />
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login" />
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activity.Main2Activity"
             android:label="@string/title_activity_main2"

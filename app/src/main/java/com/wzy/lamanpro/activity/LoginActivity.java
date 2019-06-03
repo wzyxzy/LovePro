@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,6 +17,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.wzy.lamanpro.R;
@@ -24,14 +28,12 @@ import com.wzy.lamanpro.common.CommonActivity;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.SPUtility;
 
-import java.util.logging.Logger;
-
 import static com.wzy.lamanpro.common.LaManApplication.isManager;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends CommonActivity {
+public class LoginActivity extends CommonActivity implements OnClickListener {
 
 
     /**
@@ -46,11 +48,18 @@ public class LoginActivity extends CommonActivity {
     private View mLoginFormView;
     private UserDaoUtils userDaoUtils;
     private CheckBox checkbox;
+    private Toolbar toolbar;
+    private ProgressBar login_progress;
+    private EditText account;
+    private EditText password;
+    private Button email_sign_in_button;
+    private LinearLayout account_login_form;
+    private ScrollView login_form;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.app_bar_login);
         initView();
         initData();
         // Set up the login form.
@@ -194,7 +203,49 @@ public class LoginActivity extends CommonActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setOnClickListener(this);
+        login_progress = (ProgressBar) findViewById(R.id.login_progress);
+        login_progress.setOnClickListener(this);
+        account = (EditText) findViewById(R.id.account);
+        account.setOnClickListener(this);
+        password = (EditText) findViewById(R.id.password);
+        password.setOnClickListener(this);
+        email_sign_in_button = (Button) findViewById(R.id.email_sign_in_button);
+        email_sign_in_button.setOnClickListener(this);
+        account_login_form = (LinearLayout) findViewById(R.id.account_login_form);
+        account_login_form.setOnClickListener(this);
+        login_form = (ScrollView) findViewById(R.id.login_form);
+        login_form.setOnClickListener(this);
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.email_sign_in_button:
+
+                break;
+        }
+    }
+
+//    private void submit() {
+//        // validate
+//        String accountString = account.getText().toString().trim();
+//        if (TextUtils.isEmpty(accountString)) {
+//            Toast.makeText(this, "accountString不能为空", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        String passwordString = password.getText().toString().trim();
+//        if (TextUtils.isEmpty(passwordString)) {
+//            Toast.makeText(this, "passwordString不能为空", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        // TODO validate success, do something
+//
+//
+//    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate

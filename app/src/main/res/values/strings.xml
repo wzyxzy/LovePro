@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">拉曼</string>
+    <string name="app_name">Raman Security Check</string>
     <string name="title_activity_login">登陆</string>
     <!-- Strings related to login -->
     <string name="prompt_email">账号</string>
