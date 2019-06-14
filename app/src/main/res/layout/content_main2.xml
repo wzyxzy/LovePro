@@ -20,10 +20,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
+        android:background="@drawable/button_back"
         android:contentDescription="点击此处开始测试"
         android:text="开始测试"
         android:textColor="@color/bg_white"
-        android:background="@drawable/button_back"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -38,13 +38,24 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lineChart" />
 
+    <TextView
+        android:id="@+id/text_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_report" />
+
 
     <TextView
         android:id="@+id/state"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:background="@drawable/text_border"
+        android:layout_margin="16dp"
         android:scrollbars="vertical"
+        android:text="测试流程详情记录："
+        app:layout_constraintBottom_toTopOf="@id/button_start"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_report" />
+        app:layout_constraintTop_toBottomOf="@id/text_location" />
 
 </android.support.constraint.ConstraintLayout>

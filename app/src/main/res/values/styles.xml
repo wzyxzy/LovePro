@@ -43,6 +43,7 @@
     </style>
 
     <style name="CommonPopup" parent="AppTheme">
+        <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">true</item><!--半透明-->
         <item name="android:windowBackground">@color/bg_white</item><!--除去背景色-->
@@ -73,6 +74,7 @@
         <item name="android:layout_marginRight">20dp</item>
         <item name="android:layout_marginTop">30dp</item>
         <item name="android:ems">10</item>
+        <item name="android:enabled">false</item>
         <item name="android:inputType">textPersonName</item>
     </style>
 

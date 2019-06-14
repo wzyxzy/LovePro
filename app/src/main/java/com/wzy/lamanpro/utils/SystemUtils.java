@@ -2,6 +2,9 @@ package com.wzy.lamanpro.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
+
+import com.wzy.lamanpro.common.LaManApplication;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -80,6 +83,7 @@ public class SystemUtils {
             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(LaManApplication.getInstance(),"关闭系统需要root权限，请授予",Toast.LENGTH_SHORT).show();
         } finally {
             try {
                 if (os != null) {

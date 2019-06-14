@@ -31,11 +31,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +78,7 @@ public class Main2Activity extends AppCompatActivity
     private LineChart lineChart;
     private Button button_start;
     private TextView text_report;
+    private TextView text_location;
     private StringBuffer stateText;
     private Toolbar toolbar;
     private TextView state;
@@ -105,20 +108,26 @@ public class Main2Activity extends AppCompatActivity
                     button_start.setText("开始测试");
                     stateText.append("获取波形完成\n");
                     handler.sendEmptyMessage(2);
-                    ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
                     break;
                 case 1:
                     Toast.makeText(Main2Activity.this, "请输入合理范围内的设置", Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
                     state.setText(stateText.toString());
+                    lineChart.notifyDataSetChanged();
+                    lineChart.invalidate();
+                    break;
+                case 3:
+                    ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+
+                    break;
+                case 4:
+                    text_location.setText("位置是：" + locationName);
                     break;
             }
         }
     };
     private FloatingActionButton fab;
-    private NavigationView nav_view;
-    private DrawerLayout drawer_layout;
 
     @Override
     protected void onResume() {
@@ -140,6 +149,7 @@ public class Main2Activity extends AppCompatActivity
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this);
+
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
                 Toast.makeText(Main2Activity.this, "USB设备已移除！", Toast.LENGTH_SHORT).show();
                 LaManApplication.canUseUsb = false;
@@ -165,6 +175,16 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode==KeyEvent.KEYCODE_VOLUME_UP){
+//            Toast.makeText(Main2Activity.this,"关机",Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//
+//    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -182,8 +202,17 @@ public class Main2Activity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent(Main2Activity.this, SettingTest.class));
                 return true;
-//            case R.id.action_report:
-//                break;
+            case R.id.use_info:
+                new AlertDialog.Builder(Main2Activity.this)
+                        .setMessage("内容正在完善中。。。")
+                        .setTitle("使用说明:")
+                        .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -246,11 +275,13 @@ public class Main2Activity extends AppCompatActivity
         lineChart = findViewById(R.id.lineChart);
         button_start = findViewById(R.id.button_start);
         text_report = findViewById(R.id.text_report);
+        text_location = findViewById(R.id.text_location);
         button_start.setOnClickListener(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setOnClickListener(this);
         state = (TextView) findViewById(R.id.state);
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
+
         setSupportActionBar(toolbar);
         LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -263,16 +294,7 @@ public class Main2Activity extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         TextView textView = (TextView) headerView.findViewById(R.id.textView);
         textView.setText(new UserDaoUtils(this).queryUserName(SPUtility.getUserId(this)));
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("请注意：不要对可疑对燃点物质扫描！！！\n请注意：执行扫描时请勿对着眼睛！！！");
-        builder.setTitle("温 馨 提 示 :");
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();
+
         //获取定位服务
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //获取当前可用的位置控制器
@@ -304,8 +326,7 @@ public class Main2Activity extends AppCompatActivity
             if (location != null) {
                 //获取当前位置，这里只用到了经纬度
                 locationName = getLocationAddress(location);
-                stateText.append("位置是：" + locationName);
-                handler.sendEmptyMessage(2);
+                handler.sendEmptyMessage(4);
             } else
 
                 //绑定定位事件，监听位置是否改变
@@ -318,10 +339,19 @@ public class Main2Activity extends AppCompatActivity
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
-        nav_view = (NavigationView) findViewById(R.id.nav_view);
-        nav_view.setOnClickListener(this);
-        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer_layout.setOnClickListener(this);
+        handler.sendEmptyMessage(3);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Main2Activity.this);
+        builder.setMessage(LaManApplication.canUseUsb ? "仪器自检正常！" : "仪器没有连接！");
+        builder.setTitle("仪器自检:");
+        builder.setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+
     }
 
     LocationListener locationListener = new LocationListener() {
@@ -350,8 +380,7 @@ public class Main2Activity extends AppCompatActivity
             // 更新当前经纬度
             if (TextUtils.isEmpty(locationName)) {
                 locationName = getLocationAddress(arg0);
-                stateText.append("位置是：" + locationName);
-                handler.sendEmptyMessage(2);
+                handler.sendEmptyMessage(4);
             }
 //            locationName = getLocationAddress(arg0);
 //            stateText.append("位置是：" + locationName);
@@ -406,7 +435,23 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
+                ImageView imageView = new ImageView(Main2Activity.this);
+                imageView.setImageResource(R.drawable.adangerous);
+//                TextView textView=new TextView(Main2Activity.this);
+//                textView.setText("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！");
+                new AlertDialog.Builder(Main2Activity.this)
+                        .setView(imageView)
+//                        .setView(textView)
+                        .setMessage("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！")
+                        .setTitle("温 馨 提 示 :")
+                        .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
                 if (LaManApplication.canUseUsb) {
+
                     lineChart.clear();
                     xDataList.clear();
                     yDataList.clear();

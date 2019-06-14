@@ -48,7 +48,6 @@ public class LoginActivity extends CommonActivity implements OnClickListener {
     private View mLoginFormView;
     private UserDaoUtils userDaoUtils;
     private CheckBox checkbox;
-    private Toolbar toolbar;
     private ProgressBar login_progress;
     private EditText account;
     private EditText password;
@@ -59,7 +58,7 @@ public class LoginActivity extends CommonActivity implements OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.app_bar_login);
+        setContentView(R.layout.activity_login);
         initView();
         initData();
         // Set up the login form.
@@ -203,20 +202,18 @@ public class LoginActivity extends CommonActivity implements OnClickListener {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setOnClickListener(this);
-        login_progress = (ProgressBar) findViewById(R.id.login_progress);
-        login_progress.setOnClickListener(this);
-        account = (EditText) findViewById(R.id.account);
-        account.setOnClickListener(this);
-        password = (EditText) findViewById(R.id.password);
-        password.setOnClickListener(this);
-        email_sign_in_button = (Button) findViewById(R.id.email_sign_in_button);
-        email_sign_in_button.setOnClickListener(this);
-        account_login_form = (LinearLayout) findViewById(R.id.account_login_form);
-        account_login_form.setOnClickListener(this);
-        login_form = (ScrollView) findViewById(R.id.login_form);
-        login_form.setOnClickListener(this);
+//        login_progress = (ProgressBar) findViewById(R.id.login_progress);
+//        login_progress.setOnClickListener(this);
+//        account = (EditText) findViewById(R.id.account);
+//        account.setOnClickListener(this);
+//        password = (EditText) findViewById(R.id.password);
+//        password.setOnClickListener(this);
+//        email_sign_in_button = (Button) findViewById(R.id.email_sign_in_button);
+//        email_sign_in_button.setOnClickListener(this);
+//        account_login_form = (LinearLayout) findViewById(R.id.account_login_form);
+//        account_login_form.setOnClickListener(this);
+//        login_form = (ScrollView) findViewById(R.id.login_form);
+//        login_form.setOnClickListener(this);
     }
 
     @Override

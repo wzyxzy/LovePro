@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +16,10 @@ import android.widget.Toast;
 
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.bean.Users;
+import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.dao.UserDaoUtils;
+
+import java.util.Objects;
 
 public class UserDetails extends AppCompatActivity implements View.OnClickListener {
 
@@ -62,6 +66,7 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void initView() {
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         nameText = (TextView) findViewById(R.id.nameText);
         name_text = (EditText) findViewById(R.id.name_text);
         password = (EditText) findViewById(R.id.password);
@@ -149,6 +154,39 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
 //        return super.onKeyDown(keyCode, event);
 //
 //    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home && canEdit) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("您要保存修改的数据吗？");
+            builder.setTitle("特别提示");
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (submit()) {
+                        if (TextUtils.isEmpty(account_)) {
+                            new UserDaoUtils(UserDetails.this).insertUserList(users);
+                            finish();
+                        } else {
+                            new UserDaoUtils(UserDetails.this).updateUser(users);
+                            finish();
+                        }
+                    }
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+            builder.create().show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private boolean submit() {
         String text = name_text.getText().toString().trim();

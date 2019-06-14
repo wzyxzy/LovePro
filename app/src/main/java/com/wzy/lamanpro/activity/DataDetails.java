@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.wzy.lamanpro.common.LaManApplication.isManager;
 
@@ -57,7 +59,6 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
     private EditText product_detail;
     private boolean canEdit = false;
     private SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.CHINA);
-
 
 
     @Override
@@ -108,6 +109,29 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
         ChartUtil.showChart(this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home && canEdit) {
+            new AlertDialog.Builder(this).setMessage("您要保存修改的数据吗？").setTitle("特别提示").setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (submit()) {
+                        if (id == -1) {
+                            productData.setData(results);
+                            new DataDaoUtils(DataDetails.this).insertProductList(productData);
+                        } else {
+                            new DataDaoUtils(DataDetails.this).updateData(productData);
+                        }
+                        finish();
+                    }
+
+                }
+            }).setNegativeButton("取消", null).create().show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void checkEnabled() {
         product_name.setEnabled(canEdit);
         user_account.setEnabled(canEdit);
@@ -128,7 +152,9 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
 
     @SuppressLint("RestrictedApi")
     private void initView() {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
         if (!isManager) {

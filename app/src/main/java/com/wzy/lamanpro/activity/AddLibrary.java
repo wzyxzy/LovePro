@@ -30,6 +30,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.wzy.lamanpro.R;
 import com.wzy.lamanpro.bean.HisData;
 import com.wzy.lamanpro.common.LaManApplication;
+import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.dao.HisDaoUtils;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
@@ -141,12 +142,25 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
             case R.id.action_settings:
                 startActivity(new Intent(AddLibrary.this, SettingTest.class));
                 return true;
+            case R.id.use_info:
+                new AlertDialog.Builder(AddLibrary.this)
+                        .setMessage("内容正在完善中。。。")
+                        .setTitle("使用说明:")
+                        .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
+                break;
 //            case R.id.action_report:
 //
 //                break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void initView() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

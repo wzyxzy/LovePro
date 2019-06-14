@@ -12,6 +12,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
@@ -90,6 +92,32 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
                 return true;
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main3, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.user_data:
+                productData = new DataDaoUtils(this).queryAllData();
+                dataAdapter.updateRes(productData);
+//                startActivity(new Intent(AddLibrary.this, SettingTest.class));
+                return true;
+            case R.id.standard_data:
+                dataAdapter.removeAll();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initView() {
