@@ -91,6 +91,7 @@ public class ManageHis extends AppCompatActivity implements View.OnClickListener
         hisList = (ListView) findViewById(R.id.hisList);
         menu_search = (FloatingActionButton) findViewById(R.id.menu_search);
         menu_search.setOnClickListener(this);
+        Toast.makeText(this, "长按条目即可删除", Toast.LENGTH_LONG).show();
     }
 
     @Override

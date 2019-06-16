@@ -106,7 +106,7 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
             xDataList.add(String.valueOf(i));
             yDataList.add(new Entry(Float.valueOf(strings[i]), i));
         }
-        ChartUtil.showChart(this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+        ChartUtil.showChart(this, lineChart, xDataList, yDataList, "光谱图", "波长/时间", "");
     }
 
     @Override
@@ -116,13 +116,15 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (submit()) {
+                        boolean canSave = true;
                         if (id == -1) {
                             productData.setData(results);
-                            new DataDaoUtils(DataDetails.this).insertProductList(productData);
+                            canSave = new DataDaoUtils(DataDetails.this).insertProductList(productData);
                         } else {
-                            new DataDaoUtils(DataDetails.this).updateData(productData);
+                            canSave = new DataDaoUtils(DataDetails.this).updateData(productData);
                         }
-                        finish();
+                        if (canSave)
+                            finish();
                     }
 
                 }
@@ -219,13 +221,15 @@ public class DataDetails extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (submit()) {
+                        boolean canSave;
                         if (id == -1) {
                             productData.setData(results);
-                            new DataDaoUtils(DataDetails.this).insertProductList(productData);
+                            canSave = new DataDaoUtils(DataDetails.this).insertProductList(productData);
                         } else {
-                            new DataDaoUtils(DataDetails.this).updateData(productData);
+                            canSave = new DataDaoUtils(DataDetails.this).updateData(productData);
                         }
-                        finish();
+                        if (canSave)
+                            finish();
                     }
 
                 }

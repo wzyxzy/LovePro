@@ -155,6 +155,17 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
 //
 //    }
 
+    private boolean isEmailValid(String account) {
+        //TODO: Replace this with your own logic
+        return account.length() > 2;
+    }
+
+    private boolean isPasswordValid(String password) {
+        //TODO: Replace this with your own logic
+        return password.length() > 4;
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home && canEdit) {
@@ -189,23 +200,54 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private boolean submit() {
-        String text = name_text.getText().toString().trim();
-        if (TextUtils.isEmpty(text)) {
-            Toast.makeText(this, "名字不能为空", Toast.LENGTH_SHORT).show();
-            return false;
-        }
 
-        String passwordString = password.getText().toString().trim();
-        if (TextUtils.isEmpty(passwordString)) {
-            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+        name_text.setError(null);
+        password.setError(null);
+
+        boolean cancel = false;
+        View focusView = null;
+
 
         String emailString = email.getText().toString().trim();
         if (TextUtils.isEmpty(emailString)) {
-            Toast.makeText(this, "email不能为空", Toast.LENGTH_SHORT).show();
+            email.setError(getString(R.string.error_field_required));
+            focusView = email;
+            cancel = true;
+        }
+        String passwordString = password.getText().toString().trim();
+        if (TextUtils.isEmpty(passwordString) && !isPasswordValid(passwordString)) {
+            password.setError(getString(R.string.error_invalid_password));
+            focusView = password;
+            cancel = true;
+//            Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
+        }
+
+        String accountString = account.getText().toString().trim();
+        if (TextUtils.isEmpty(accountString)) {
+            account.setError(getString(R.string.error_field_required));
+            focusView = account;
+            cancel = true;
+        } else if (!isEmailValid(accountString)) {
+            account.setError(getString(R.string.error_invalid_email));
+            focusView = account;
+            cancel = true;
+        }
+
+        String text = name_text.getText().toString().trim();
+        if (TextUtils.isEmpty(text)) {
+            name_text.setError(getString(R.string.error_field_required));
+            focusView = name_text;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
             return false;
         }
+
+
 
 //        String level = pemission_level.getText().toString().trim();
 //        if (TextUtils.isEmpty(level)) {
@@ -213,11 +255,6 @@ public class UserDetails extends AppCompatActivity implements View.OnClickListen
 //            return;
 //        }
         // validate
-        String accountString = account.getText().toString().trim();
-        if (TextUtils.isEmpty(accountString)) {
-            Toast.makeText(this, "账号不能为空", Toast.LENGTH_SHORT).show();
-            return false;
-        }
 
         // TODO validate success, do something
         users.setAccount(accountString);

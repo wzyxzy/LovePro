@@ -125,6 +125,7 @@ public class ManageData extends AppCompatActivity implements View.OnClickListene
         dataList = (ListView) findViewById(R.id.dataList);
         menu_search = (FloatingActionButton) findViewById(R.id.menu_search);
         menu_search.setOnClickListener(this);
+        Toast.makeText(this, "长按条目即可删除", Toast.LENGTH_LONG).show();
     }
 
     @Override

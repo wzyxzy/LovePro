@@ -41,6 +41,10 @@ public class HisDaoUtils {
             Toast.makeText(context, "信息有错，不能保存", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (queryUserSize(hisData.getName()) > 0) {
+            Toast.makeText(context, "已有同名记录，建议修改名称", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         hisDataDao.insert(hisData);
         return true;
     }
@@ -98,14 +102,14 @@ public class HisDaoUtils {
         return qb.list();
     }
 
-//    /**
-//     * 查询用户个数
-//     */
-//    public int queryUserSize(String account) {
-//        QueryBuilder<Users> qb = usersDao.queryBuilder();
-//        qb.where(UsersDao.Properties.Account.eq(account));
-//        return qb.list().size();
-//    }
+    /**
+     * 查询用户个数
+     */
+    public int queryUserSize(String name) {
+        QueryBuilder<HisData> qb = hisDataDao.queryBuilder();
+        qb.where(HisDataDao.Properties.Name.eq(name));
+        return qb.list().size();
+    }
 
     /**
      * 查询数据

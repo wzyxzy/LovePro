@@ -63,6 +63,8 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.wzy.lamanpro.common.LaManApplication.canUseUsb;
+import static com.wzy.lamanpro.common.LaManApplication.easyMode;
 import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
 
 public class Main2Activity extends AppCompatActivity
@@ -107,7 +109,9 @@ public class Main2Activity extends AppCompatActivity
                     button_start.setEnabled(true);
                     button_start.setText("开始测试");
                     stateText.append("获取波形完成\n");
+                    testCount = 0;
                     handler.sendEmptyMessage(2);
+
                     break;
                 case 1:
                     Toast.makeText(Main2Activity.this, "请输入合理范围内的设置", Toast.LENGTH_SHORT).show();
@@ -118,7 +122,7 @@ public class Main2Activity extends AppCompatActivity
                     lineChart.invalidate();
                     break;
                 case 3:
-                    ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+                    ChartUtil.showChart(Main2Activity.this, lineChart, xDataList, yDataList, "光谱图", "波长/时间", "");
 
                     break;
                 case 4:
@@ -350,7 +354,19 @@ public class Main2Activity extends AppCompatActivity
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+                if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                    alertDialog.dismiss();
+                    return true;
+
+                }
+                return false;
+            }
+        });
 
     }
 
@@ -431,110 +447,180 @@ public class Main2Activity extends AppCompatActivity
         }
     }
 
+    private int testCount = 0;
+
+    //音量键，唤起开始测试
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+//            Toast.makeText(Main2Activity.this, testCount + "", Toast.LENGTH_SHORT).show();
+
+            switch (testCount) {
+                case 0:
+                    test();
+//                    testCount++;
+                    return true;
+
+                default:
+
+                    return super.onKeyDown(keyCode, event);
+            }
+
+        }
+        return super.onKeyDown(keyCode, event);
+
+    }
+
+    private void test() {
+        if (LaManApplication.canUseUsb) {
+            ImageView imageView = new ImageView(Main2Activity.this);
+            imageView.setImageResource(R.drawable.adangerous);
+//                TextView textView=new TextView(Main2Activity.this);
+//                textView.setText("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Main2Activity.this);
+
+            builder.setView(imageView)
+//                        .setView(textView)
+                    .setMessage("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！")
+                    .setTitle("温 馨 提 示 :")
+                    .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            testNow();
+                            testCount++;
+                        }
+                    });
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    try {
+                        Thread.sleep(100); // 休眠1秒
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    /**
+                     * 延时执行的代码
+                     */
+                    alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                        @Override
+                        public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+                            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                                testNow();
+                                alertDialog.dismiss();
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+                }
+            }).start();
+        } else {
+            Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
+            testCount = 0;
+        }
+
+    }
+
+    private void testNow() {
+
+        lineChart.clear();
+        xDataList.clear();
+        yDataList.clear();
+        final int[] count = {0, 0};
+        once = easyMode || TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
+        time = easyMode || TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
+        power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
+        stateText = new StringBuffer();
+        stateText.append("开始测试，积分次数为" + once + "次\n");
+        button_start.setEnabled(false);
+        button_start.setText("正在测试");
+        handler.sendEmptyMessage(2);
+        testCount = 2;
+        results = new byte[once][4200];
+        finalsResults = new float[2100];
+        final Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                switch (count[0]) {
+                    case 0:
+                        try {
+                            UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
+                            stateText.append("第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ");
+//                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
+                            handler.sendEmptyMessage(2);
+                        } catch (NumberFormatException e) {
+                            handler.sendEmptyMessage(1);
+                        }
+                        break;
+                    case 1:
+                        try {
+                            UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
+                            stateText.append("功率为：" + power + "。\n");
+//                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
+                            handler.sendEmptyMessage(2);
+                        } catch (NumberFormatException e) {
+                            handler.sendEmptyMessage(1);
+                        }
+                        break;
+                    case 2:
+                        UsbUtils.sendToUsb(OPEN_PORT);
+//                                    stateText.append("打开激光发送完毕。\n");
+//                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
+                        handler.sendEmptyMessage(2);
+                        break;
+                    case 3:
+                        UsbUtils.sendToUsb(GET_DATA);
+//                                    stateText.append("获取波形发送完毕。\n");
+//                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
+                        handler.sendEmptyMessage(2);
+                        break;
+                    case 4:
+                        results[count[1]++] = readFromUsb();
+//                                    stateText.append("返回结果完毕并存储。\n");
+//                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
+                        break;
+                    case 5:
+                        for (int i = 0; i < finalsResults.length; i++) {
+                            finalsResults[i] = UsbUtils.twoByteToUnsignedInt(results[0][2 * i + 1], results[0][2 * i]);
+                        }
+                        label1:
+                        for (int i = 0; i < results.length; i++) {
+                            for (int j = 0; j < finalsResults.length; j++) {
+                                if (i == 0) {
+                                    continue label1;
+                                } else {
+                                    finalsResults[j] = (finalsResults[j] + UsbUtils.twoByteToUnsignedInt(results[i][2 * j + 1], results[i][2 * j])) / 2;
+                                }
+                            }
+                        }
+                        handler.sendEmptyMessage(0);
+                        timer.cancel();
+                        break;
+                }
+                count[0]++;
+                if (once >= count[1] + 1)
+                    count[0] %= 5;
+            }
+        };
+        timer.schedule(timerTask, 50, 50);
+
+
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_start:
-                ImageView imageView = new ImageView(Main2Activity.this);
-                imageView.setImageResource(R.drawable.adangerous);
-//                TextView textView=new TextView(Main2Activity.this);
-//                textView.setText("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！");
-                new AlertDialog.Builder(Main2Activity.this)
-                        .setView(imageView)
-//                        .setView(textView)
-                        .setMessage("当心激光辐射\n执行扫描时请勿将眼睛对着出射窗口！")
-                        .setTitle("温 馨 提 示 :")
-                        .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
-                if (LaManApplication.canUseUsb) {
+                test();
 
-                    lineChart.clear();
-                    xDataList.clear();
-                    yDataList.clear();
-                    final int[] count = {0, 0};
-                    once = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
-                    time = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
-                    power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
-                    stateText = new StringBuffer();
-                    stateText.append("开始测试，积分次数为" + once + "次\n");
-                    button_start.setEnabled(false);
-                    button_start.setText("正在测试");
-                    handler.sendEmptyMessage(2);
-                    results = new byte[once][4200];
-                    finalsResults = new float[2100];
-                    final Timer timer = new Timer();
-                    TimerTask timerTask = new TimerTask() {
-                        @Override
-                        public void run() {
-                            switch (count[0]) {
-                                case 0:
-                                    try {
-                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                                        stateText.append("第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ");
-//                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
-                                        handler.sendEmptyMessage(2);
-                                    } catch (NumberFormatException e) {
-                                        handler.sendEmptyMessage(1);
-                                    }
-                                    break;
-                                case 1:
-                                    try {
-                                        UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
-                                        stateText.append("功率为：" + power + "。\n");
-//                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
-                                        handler.sendEmptyMessage(2);
-                                    } catch (NumberFormatException e) {
-                                        handler.sendEmptyMessage(1);
-                                    }
-                                    break;
-                                case 2:
-                                    UsbUtils.sendToUsb(OPEN_PORT);
-//                                    stateText.append("打开激光发送完毕。\n");
-//                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
-                                    handler.sendEmptyMessage(2);
-                                    break;
-                                case 3:
-                                    UsbUtils.sendToUsb(GET_DATA);
-//                                    stateText.append("获取波形发送完毕。\n");
-//                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
-                                    handler.sendEmptyMessage(2);
-                                    break;
-                                case 4:
-                                    results[count[1]++] = readFromUsb();
-//                                    stateText.append("返回结果完毕并存储。\n");
-//                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
-                                    break;
-                                case 5:
-                                    for (int i = 0; i < finalsResults.length; i++) {
-                                        finalsResults[i] = UsbUtils.twoByteToUnsignedInt(results[0][2 * i + 1], results[0][2 * i]);
-                                    }
-                                    label1:
-                                    for (int i = 0; i < results.length; i++) {
-                                        for (int j = 0; j < finalsResults.length; j++) {
-                                            if (i == 0) {
-                                                continue label1;
-                                            } else {
-                                                finalsResults[j] = (finalsResults[j] + UsbUtils.twoByteToUnsignedInt(results[i][2 * j + 1], results[i][2 * j])) / 2;
-                                            }
-                                        }
-                                    }
-                                    handler.sendEmptyMessage(0);
-                                    timer.cancel();
-                                    break;
-                            }
-                            count[0]++;
-                            if (once >= count[1] + 1)
-                                count[0] %= 5;
-                        }
-                    };
-                    timer.schedule(timerTask, 50, 50);
-                } else {
-                    Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
-                }
                 break;
             case R.id.fab:
                 Snackbar.make(v, "点击此处可以保存测试数据，是否要保存？", Snackbar.LENGTH_LONG)
@@ -560,11 +646,12 @@ public class Main2Activity extends AppCompatActivity
                                                 for (float finalsResult : finalsResults) {
                                                     stringBuffer.append(finalsResult + ",");
                                                 }
-                                                new HisDaoUtils(Main2Activity.this).insertHisDataList(new HisData(stringBuffer.toString(), new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()), input, new UserDaoUtils(Main2Activity.this).queryUserName(userid),
+                                                boolean canSave = new HisDaoUtils(Main2Activity.this).insertHisDataList(new HisData(stringBuffer.toString(), new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()), input, new UserDaoUtils(Main2Activity.this).queryUserName(userid),
                                                         userid, String.valueOf(time), String.valueOf(power),
                                                         locationName));
                                                 pd2.dismiss();
-                                                dialog.dismiss();
+                                                if (canSave)
+                                                    dialog.dismiss();
                                             }
                                         }).setNegativeButton("取消", null).create().show();
                             }

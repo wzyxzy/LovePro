@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.data.FileDescriptorAssetPathFetcher;
 import com.wzy.lamanpro.bean.DaoMaster;
 import com.wzy.lamanpro.bean.DaoSession;
 import com.wzy.lamanpro.bean.HisData;
@@ -41,6 +42,10 @@ public class DataDaoUtils {
             Toast.makeText(context, "信息有错，不能添加", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (queryUserSize(productData.getProName()) > 0) {
+            Toast.makeText(context, "已有同名记录，建议修改名称", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         productDataDao.insert(productData);
         return true;
     }
@@ -50,11 +55,12 @@ public class DataDaoUtils {
      *
      * @param productData 用户账户
      */
-    public void updateData(ProductData productData) {
+    public boolean updateData(ProductData productData) {
         if (productData == null) {
-            return;
+            return false;
         }
         productDataDao.update(productData);
+        return true;
     }
 
 
@@ -98,14 +104,14 @@ public class DataDaoUtils {
         return qb.list();
     }
 
-//    /**
-//     * 查询用户个数
-//     */
-//    public int queryUserSize(String account) {
-//        QueryBuilder<Users> qb = usersDao.queryBuilder();
-//        qb.where(UsersDao.Properties.Account.eq(account));
-//        return qb.list().size();
-//    }
+    /**
+     * 查询用户个数
+     */
+    public int queryUserSize(String name) {
+        QueryBuilder<ProductData> qb = productDataDao.queryBuilder();
+        qb.where(ProductDataDao.Properties.ProName.eq(name));
+        return qb.list().size();
+    }
 
     /**
      * 查询数据

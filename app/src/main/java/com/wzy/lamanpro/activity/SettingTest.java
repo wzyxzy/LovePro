@@ -15,6 +15,8 @@ import android.view.View;
 
 import com.wzy.lamanpro.R;
 
+import static com.wzy.lamanpro.common.LaManApplication.easyMode;
+
 public class SettingTest extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
     private Preference time;
@@ -39,12 +41,13 @@ public class SettingTest extends PreferenceActivity implements Preference.OnPref
         cbp = (CheckBoxPreference) findPreference("use_mode");
 
         cbp.setOnPreferenceClickListener(this);
+        easyMode = !cbp.isChecked();
         if (cbp.isChecked()) {
             time.setEnabled(true);
             once.setEnabled(true);
             cbp.setSummary("当前为精检模式");
 
-        }else {
+        } else {
             time.setEnabled(false);
             once.setEnabled(false);
             cbp.setSummary("当前为快检模式");
@@ -82,17 +85,18 @@ public class SettingTest extends PreferenceActivity implements Preference.OnPref
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
-
+        easyMode = !cbp.isChecked();
         if (cbp.isChecked()) {
             time.setEnabled(true);
             once.setEnabled(true);
             cbp.setSummary("当前为精检模式");
 
-        }else {
+
+        } else {
             time.setEnabled(false);
             once.setEnabled(false);
             cbp.setSummary("当前为快检模式");
         }
-         return true;
+        return true;
     }
 }

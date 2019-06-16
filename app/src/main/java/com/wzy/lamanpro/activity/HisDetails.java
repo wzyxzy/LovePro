@@ -69,7 +69,7 @@ public class HisDetails extends AppCompatActivity implements View.OnClickListene
             xDataList.add(String.valueOf(i));
             yDataList.add(new Entry(Float.valueOf(strings[i]), i));
         }
-        ChartUtil.showChart(this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+        ChartUtil.showChart(this, lineChart, xDataList, yDataList, "光谱图", "波长/时间", "");
     }
 
     private void initView() {

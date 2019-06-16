@@ -79,7 +79,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     button_start.setText("开始测试");
                     stateText.append("获取波形完成\n");
                     handler.sendEmptyMessage(2);
-                    ChartUtil.showChart(AddLibrary.this, lineChart, xDataList, yDataList, "波普图", "波长/时间", "mm");
+                    ChartUtil.showChart(AddLibrary.this, lineChart, xDataList, yDataList, "光谱图", "波长/时间", "");
                     break;
                 case 1:
                     Toast.makeText(AddLibrary.this, "请输入合理范围内的设置", Toast.LENGTH_SHORT).show();

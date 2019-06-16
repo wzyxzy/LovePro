@@ -14,6 +14,7 @@ public class LaManApplication extends Application {
     private static LaManApplication appContext;
     public static boolean canUseUsb;
     public static boolean isManager;
+    public static boolean easyMode;
 
     public static LaManApplication getInstance() {
         return appContext;
@@ -22,6 +23,7 @@ public class LaManApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        easyMode = true;
         appContext = this;
         initOkgo();
         initStetho();
