@@ -155,7 +155,7 @@ public class Main2Activity extends AppCompatActivity
                 LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this);
 
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                Toast.makeText(Main2Activity.this, "USB设备已移除！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Main2Activity.this, "光谱仪设备已移除！", Toast.LENGTH_SHORT).show();
                 LaManApplication.canUseUsb = false;
             }
         }
@@ -522,7 +522,7 @@ public class Main2Activity extends AppCompatActivity
                 }
             }).start();
         } else {
-            Toast.makeText(Main2Activity.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Main2Activity.this, "请先连接光谱仪设备！", Toast.LENGTH_SHORT).show();
             testCount = 0;
         }
 

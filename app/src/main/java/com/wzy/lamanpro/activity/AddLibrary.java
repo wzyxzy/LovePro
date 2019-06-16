@@ -119,7 +119,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 LaManApplication.canUseUsb = UsbUtils.initUsbData(AddLibrary.this);
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                Toast.makeText(AddLibrary.this, "USB设备已移除！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddLibrary.this, "光谱仪设备已移除！", Toast.LENGTH_SHORT).show();
                 LaManApplication.canUseUsb = false;
             }
         }
@@ -260,7 +260,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     };
                     timer.schedule(timerTask, 50, 50);
                 } else {
-                    Toast.makeText(AddLibrary.this, "请先连接usb设备！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddLibrary.this, "请先连接光谱仪设备！", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.fab:

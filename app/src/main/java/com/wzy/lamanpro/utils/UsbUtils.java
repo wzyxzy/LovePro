@@ -60,7 +60,7 @@ public class UsbUtils {
             mUsbDevice = deviceIterator.next();
         }
         if (mUsbDevice == null || mUsbDevice.getInterfaceCount() == 0) {
-            showTmsg("请使用usb连接设备");
+            showTmsg("请连接光谱仪设备");
             return false;
         }
         //获取设备接口
@@ -88,7 +88,7 @@ public class UsbUtils {
                     return false;
                 }
                 if (mDeviceConnection.claimInterface(mInterface, true)) {
-                    showTmsg("USB连接成功！");
+                    showTmsg("光谱仪连接成功！");
 
                     return true;
 
