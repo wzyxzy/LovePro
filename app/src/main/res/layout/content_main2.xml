@@ -49,12 +49,22 @@
     <TextView
         android:id="@+id/state"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/text_border"
-        android:layout_margin="16dp"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
         android:scrollbars="vertical"
-        android:text="测试流程详情记录："
-        app:layout_constraintBottom_toTopOf="@id/button_start"
+        android:text=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_bar" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:max="100"
+        android:progress="0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_location" />
 

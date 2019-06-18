@@ -38,6 +38,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +64,6 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.wzy.lamanpro.common.LaManApplication.canUseUsb;
 import static com.wzy.lamanpro.common.LaManApplication.easyMode;
 import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
 
@@ -81,7 +81,7 @@ public class Main2Activity extends AppCompatActivity
     private Button button_start;
     private TextView text_report;
     private TextView text_location;
-    private StringBuffer stateText;
+    private String stateText = "";
     private Toolbar toolbar;
     private TextView state;
     private DrawerLayout drawer;
@@ -108,7 +108,8 @@ public class Main2Activity extends AppCompatActivity
                     }
                     button_start.setEnabled(true);
                     button_start.setText("开始测试");
-                    stateText.append("获取波形完成\n");
+//                    stateText.
+                    stateText = "获取波形完成\n";
                     testCount = 0;
                     handler.sendEmptyMessage(2);
                     handler.sendEmptyMessage(3);
@@ -118,7 +119,7 @@ public class Main2Activity extends AppCompatActivity
                     Toast.makeText(Main2Activity.this, "请输入合理范围内的设置", Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
-                    state.setText(stateText.toString());
+                    state.setText(stateText);
                     lineChart.notifyDataSetChanged();
                     lineChart.invalidate();
                     break;
@@ -129,10 +130,14 @@ public class Main2Activity extends AppCompatActivity
                 case 4:
                     text_location.setText("位置是：" + locationName);
                     break;
+
             }
         }
     };
     private FloatingActionButton fab;
+    private ProgressBar progress_bar;
+    private NavigationView nav_view;
+    private DrawerLayout drawer_layout;
 
     @Override
     protected void onResume() {
@@ -276,7 +281,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void initView() {
-        stateText = new StringBuffer();
+//        stateText = new StringBuffer();
         lineChart = findViewById(R.id.lineChart);
         button_start = findViewById(R.id.button_start);
         text_report = findViewById(R.id.text_report);
@@ -369,6 +374,12 @@ public class Main2Activity extends AppCompatActivity
             }
         });
 
+        progress_bar = (ProgressBar) findViewById(R.id.progress_bar);
+        progress_bar.setOnClickListener(this);
+        nav_view = (NavigationView) findViewById(R.id.nav_view);
+        nav_view.setOnClickListener(this);
+        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer_layout.setOnClickListener(this);
     }
 
     LocationListener locationListener = new LocationListener() {
@@ -530,8 +541,9 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void testNow() {
-        if (!LaManApplication.canUseUsb){
+        if (!LaManApplication.canUseUsb) {
             Toast.makeText(Main2Activity.this, "请先连接光谱仪设备！", Toast.LENGTH_SHORT).show();
+
             return;
         }
         lineChart.clear();
@@ -541,8 +553,8 @@ public class Main2Activity extends AppCompatActivity
         once = easyMode || TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "once")) ? 10 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "once"));
         time = easyMode || TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "time")) ? 500 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "time"));
         power = TextUtils.isEmpty(SPUtility.getSPString(Main2Activity.this, "power")) ? 66 : Integer.valueOf(SPUtility.getSPString(Main2Activity.this, "power"));
-        stateText = new StringBuffer();
-        stateText.append("开始测试，积分次数为" + once + "次\n");
+//        stateText = new StringBuffer();
+        stateText = "开始测试，积分次数为" + once + "次\n";
         button_start.setEnabled(false);
         button_start.setText("正在测试");
         handler.sendEmptyMessage(2);
@@ -557,7 +569,7 @@ public class Main2Activity extends AppCompatActivity
                     case 0:
                         try {
                             UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                            stateText.append("第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ");
+                            stateText = "第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ";
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                             handler.sendEmptyMessage(2);
                         } catch (NumberFormatException e) {
@@ -567,7 +579,7 @@ public class Main2Activity extends AppCompatActivity
                     case 1:
                         try {
                             UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
-                            stateText.append("功率为：" + power + "。\n");
+                            stateText = "功率为：" + power + "。\n";
 //                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
                             handler.sendEmptyMessage(2);
                         } catch (NumberFormatException e) {
@@ -588,6 +600,7 @@ public class Main2Activity extends AppCompatActivity
                         break;
                     case 4:
                         results[count[1]++] = readFromUsb();
+                        progress_bar.setProgress(count[1] * 100 / once);
 //                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                         break;
