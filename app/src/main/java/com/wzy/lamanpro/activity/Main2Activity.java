@@ -569,7 +569,7 @@ public class Main2Activity extends AppCompatActivity
                     case 0:
                         try {
                             UsbUtils.sendToUsb(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000)));
-                            stateText = "第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  ";
+                            stateText = "第" + (count[1] + 1) + "次积分：  积分时间为" + time + "毫秒。  功率为：" + power + "。";
 //                                        stateText.append("积分时间设置完毕，积分时间为" + time + "毫秒，发送的内容是：" + Arrays.toString(UsbUtils.addBytes(SET_INIT_TIME, UsbUtils.intTobyteLH(time * 1000))) + "\n");
                             handler.sendEmptyMessage(2);
                         } catch (NumberFormatException e) {
@@ -579,9 +579,9 @@ public class Main2Activity extends AppCompatActivity
                     case 1:
                         try {
                             UsbUtils.sendToUsb(UsbUtils.addBytes(SET_POWER, UsbUtils.intTobyteLH(power)));
-                            stateText = "功率为：" + power + "。\n";
+//                            stateText = "功率为：" + power + "。";
 //                                    stateText.append("功率设置发送完毕，发送的内容是：" + Arrays.toString(SET_POWER) + "\n");
-                            handler.sendEmptyMessage(2);
+//                            handler.sendEmptyMessage(2);
                         } catch (NumberFormatException e) {
                             handler.sendEmptyMessage(1);
                         }
@@ -590,13 +590,13 @@ public class Main2Activity extends AppCompatActivity
                         UsbUtils.sendToUsb(OPEN_PORT);
 //                                    stateText.append("打开激光发送完毕。\n");
 //                                    stateText.append("打开激光发送完毕，发送的内容是：" + Arrays.toString(OPEN_PORT) + "\n");
-                        handler.sendEmptyMessage(2);
+//                        handler.sendEmptyMessage(2);
                         break;
                     case 3:
                         UsbUtils.sendToUsb(GET_DATA);
 //                                    stateText.append("获取波形发送完毕。\n");
 //                                    stateText.append("获取波形发送完毕，发送的内容是：" + Arrays.toString(GET_DATA) + "\n");
-                        handler.sendEmptyMessage(2);
+//                        handler.sendEmptyMessage(2);
                         break;
                     case 4:
                         results[count[1]++] = readFromUsb();
