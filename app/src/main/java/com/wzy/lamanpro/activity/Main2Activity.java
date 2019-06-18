@@ -111,6 +111,7 @@ public class Main2Activity extends AppCompatActivity
                     stateText.append("获取波形完成\n");
                     testCount = 0;
                     handler.sendEmptyMessage(2);
+                    handler.sendEmptyMessage(3);
 
                     break;
                 case 1:
@@ -500,7 +501,7 @@ public class Main2Activity extends AppCompatActivity
                 public void run() {
 
                     try {
-                        Thread.sleep(100); // 休眠1秒
+                        Thread.sleep(300); // 休眠1秒
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -529,7 +530,10 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void testNow() {
-
+        if (!LaManApplication.canUseUsb){
+            Toast.makeText(Main2Activity.this, "请先连接光谱仪设备！", Toast.LENGTH_SHORT).show();
+            return;
+        }
         lineChart.clear();
         xDataList.clear();
         yDataList.clear();
@@ -611,7 +615,6 @@ public class Main2Activity extends AppCompatActivity
             }
         };
         timer.schedule(timerTask, 50, 50);
-
 
     }
 
