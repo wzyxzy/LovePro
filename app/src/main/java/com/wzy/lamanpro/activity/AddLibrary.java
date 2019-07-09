@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -34,9 +35,11 @@ import com.wzy.lamanpro.dao.DataDaoUtils;
 import com.wzy.lamanpro.dao.HisDaoUtils;
 import com.wzy.lamanpro.dao.UserDaoUtils;
 import com.wzy.lamanpro.utils.ChartUtil;
+import com.wzy.lamanpro.utils.FileUtils;
 import com.wzy.lamanpro.utils.SPUtility;
 import com.wzy.lamanpro.utils.UsbUtils;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -193,6 +196,9 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     handler.sendEmptyMessage(2);
                     results = new byte[once][4200];
                     finalsResults = new float[2100];
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+                    final String fileName = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试原始数据-" + sdf.format(new Date()) + ".txt";
+
                     final Timer timer = new Timer();
                     TimerTask timerTask = new TimerTask() {
                         @Override
@@ -232,6 +238,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                     break;
                                 case 4:
                                     results[count[1]++] = readFromUsb();
+                                    FileUtils.writeFile(fileName, String.valueOf(results[count[1] - 1]), true);
 //                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                                     break;
