@@ -120,10 +120,10 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                LaManApplication.canUseUsb = UsbUtils.initUsbData(AddLibrary.this);
+                LaManApplication.canUseUsb = UsbUtils.initUsbData(AddLibrary.this, true);
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                Toast.makeText(AddLibrary.this, "光谱仪设备已移除！", Toast.LENGTH_SHORT).show();
-                LaManApplication.canUseUsb = false;
+                Toast.makeText(AddLibrary.this, "设备已移除！", Toast.LENGTH_SHORT).show();
+                LaManApplication.canUseUsb = UsbUtils.initUsbData(AddLibrary.this, false);
             }
         }
     };
@@ -164,14 +164,13 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
     }
 
 
-
     private void initView() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         lineChart = (LineChart) findViewById(R.id.lineChart);
         button_start = (Button) findViewById(R.id.button_start);
         state = (TextView) findViewById(R.id.state);
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
-        LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
+        LaManApplication.canUseUsb = UsbUtils.initUsbData(this, true);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         button_start.setOnClickListener(this);
         fab.setOnClickListener(this);
@@ -196,8 +195,8 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                     handler.sendEmptyMessage(2);
                     results = new byte[once][4200];
                     finalsResults = new float[2100];
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-                    final String fileName = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试原始数据-" + sdf.format(new Date()) + ".txt";
+//                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+//                    final String fileName = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试原始数据-" + sdf.format(new Date()) + ".txt";
 
                     final Timer timer = new Timer();
                     TimerTask timerTask = new TimerTask() {
@@ -238,7 +237,7 @@ public class AddLibrary extends AppCompatActivity implements View.OnClickListene
                                     break;
                                 case 4:
                                     results[count[1]++] = readFromUsb();
-                                    FileUtils.writeFile(fileName, String.valueOf(results[count[1] - 1]), true);
+//                                    FileUtils.writeFile(fileName, String.valueOf(results[count[1] - 1]) + "\r\n", true);
 //                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                                     break;

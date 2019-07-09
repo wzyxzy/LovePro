@@ -46,7 +46,7 @@ public class UsbUtils {
     private static byte[] receiveytes;
     private static Context context;
 
-    public static boolean initUsbData(Context context) {
+    public static boolean initUsbData(Context context, boolean attach) {
         UsbUtils.context = context;
 
         // 获取USB设备
@@ -71,6 +71,11 @@ public class UsbUtils {
             mInterface = usbInterface;
             break;
         }
+        if (mInterface.getEndpointCount() < 3) {
+            showTmsg(attach ? "u盘连接成功！" : "u盘已拔出！");
+            return false;
+        }
+
         //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
         if (mInterface.getEndpoint(3) != null) {
             usbEpOut = mInterface.getEndpoint(3);
@@ -126,7 +131,7 @@ public class UsbUtils {
                             //授权成功,在这里进行打开设备操作
                             LaManApplication.canUseUsb = true;
                             //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
-                            initUsbData(context);
+                            initUsbData(context, true);
 
                         } else {
                             showTmsg("USB授权失败！");

@@ -161,11 +161,11 @@ public class Main2Activity extends AppCompatActivity
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-                LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this);
+                LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this, true);
 
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-                Toast.makeText(Main2Activity.this, "光谱仪设备已移除！", Toast.LENGTH_SHORT).show();
-                LaManApplication.canUseUsb = false;
+                Toast.makeText(Main2Activity.this, "设备已移除！", Toast.LENGTH_SHORT).show();
+                LaManApplication.canUseUsb = UsbUtils.initUsbData(Main2Activity.this, false);
             }
         }
     };
@@ -296,7 +296,7 @@ public class Main2Activity extends AppCompatActivity
         state.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         setSupportActionBar(toolbar);
-        LaManApplication.canUseUsb = UsbUtils.initUsbData(this);
+        LaManApplication.canUseUsb = UsbUtils.initUsbData(this, true);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -564,8 +564,8 @@ public class Main2Activity extends AppCompatActivity
         testCount = 2;
         results = new byte[once][4200];
         finalsResults = new float[2100];
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        final String fileName = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试原始数据-" + sdf.format(new Date()) + ".txt";
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        final String fileName = Environment.getExternalStorageDirectory() + File.separator + "拉曼测试原始数据-" + new Date().getTime() + ".txt";
         final Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -606,7 +606,7 @@ public class Main2Activity extends AppCompatActivity
                     case 4:
                         results[count[1]++] = readFromUsb();
                         progress_bar.setProgress(count[1] * 100 / once);
-                        FileUtils.writeFile(fileName, String.valueOf(results[count[1] - 1]), true);
+                        FileUtils.writeFile(fileName, String.valueOf(results[count[1] - 1]) + "\r\n", true);
 //                                    stateText.append("返回结果完毕并存储。\n");
 //                                    stateText.append("返回的内容是：" + Arrays.toString(results) + "\n");
                         break;
