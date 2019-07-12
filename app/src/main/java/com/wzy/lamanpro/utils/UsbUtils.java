@@ -71,19 +71,16 @@ public class UsbUtils {
             mInterface = usbInterface;
             break;
         }
+//        if (mInterface.getEndpointCount() < 3 && !attach) {
+//            showTmsg("u盘已拔出！");
+//            return false;
+//        }
         if (mInterface.getEndpointCount() < 3) {
             showTmsg(attach ? "u盘连接成功！" : "u盘已拔出！");
             return false;
         }
 
-        //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
-        if (mInterface.getEndpoint(3) != null) {
-            usbEpOut = mInterface.getEndpoint(3);
-        }
-        if (mInterface.getEndpoint(2) != null) {
-            usbEpIn = mInterface.getEndpoint(2);
-        }
-        if (mInterface != null) {
+        if (mInterface != null && attach) {
             // 判断是否有权限
             UsbPermissionReceiver usbPermissionReceiver = new UsbPermissionReceiver();
             if (manager.hasPermission(mUsbDevice)) {
@@ -93,6 +90,15 @@ public class UsbUtils {
                     return false;
                 }
                 if (mDeviceConnection.claimInterface(mInterface, true)) {
+
+                    //用UsbDeviceConnection 与 UsbInterface 进行端点设置和通讯
+                    if (mInterface.getEndpoint(3) != null) {
+                        usbEpOut = mInterface.getEndpoint(3);
+                    }
+                    if (mInterface.getEndpoint(2) != null) {
+                        usbEpIn = mInterface.getEndpoint(2);
+                    }
+
                     showTmsg("光谱仪连接成功！");
 
                     return true;

@@ -12,9 +12,5 @@
         android:orderInCategory="101"
         android:title="@string/action_data_copy"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/use_info"
-        android:orderInCategory="102"
-        android:title="使用说明"
-        app:showAsAction="never" />
+
 </menu>

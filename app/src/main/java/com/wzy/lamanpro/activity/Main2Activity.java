@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.storage.StorageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -59,6 +60,7 @@ import com.wzy.lamanpro.utils.UsbUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,6 +71,7 @@ import java.util.TimerTask;
 
 import static com.wzy.lamanpro.common.LaManApplication.easyMode;
 import static com.wzy.lamanpro.utils.UsbUtils.readFromUsb;
+import static com.wzy.lamanpro.utils.UsbUtils.showTmsg;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -226,6 +229,69 @@ public class Main2Activity extends AppCompatActivity
                             }
                         }).create().show();
                 break;
+            case R.id.data_copy:
+
+
+                new AlertDialog.Builder(Main2Activity.this)
+                        .setMessage("该功能暂未开通。。。")
+                        .setTitle("数据备份:")
+                        .setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create().show();
+                break;
+
+//                String a = File.separator + "拉曼测试报告-" + new Date().getTime() + ".pdf";
+//                final StorageManager sm = (StorageManager) this.getSystemService(Context.STORAGE_SERVICE);
+//                String[] volumePaths = new String[0];
+//                String sdDirect = "";
+//                try {
+//                    final Method method = sm.getClass().getMethod("getVolumePaths");
+//                    if (null != method) {
+//                        method.setAccessible(true);
+//                        volumePaths = (String[]) method.invoke(sm);
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                if ((volumePaths != null) && (volumePaths.length > 0)) {
+//                    for (String sdcardPath : volumePaths) {
+//                        if (!sdcardPath.equalsIgnoreCase(Environment.getExternalStorageDirectory().getAbsolutePath())) {
+//                            sdDirect = sdcardPath;
+//                        }
+////                        showTmsg("sdcardPath:" + sdcardPath);
+////                        Log.d(TAG,"sdcardPath:" + sdcardPath);
+//                    }
+//                }
+//                if (sdDirect.contains("null")) {
+//                    showTmsg("u盘正在安装，请稍后再试！");
+//                    return false;
+//                }
+//                if (!TextUtils.isEmpty(sdDirect)) {
+//                    File[] dirFiles = Environment.getExternalStorageDirectory().listFiles();
+//                    int count = 0;
+//                    for (File dirFile : dirFiles) {
+//                        if (dirFile.getName().startsWith("拉曼测试报告-") && dirFile.getName().endsWith(".pdf")) {
+////                            showTmsg(sdDirect);
+//                            FileUtils.copyFile(dirFile.getAbsolutePath(), sdDirect + File.separator + dirFile.getName());
+//                            count++;
+//
+//                        }
+//                    }
+//
+//                    if (count == 0) {
+//                        showTmsg("没有数据文件！");
+//                    } else {
+//                        showTmsg("导出数据完成，一共导出" + count + "个文件！");
+//                    }
+//                } else {
+//                    showTmsg("请先插入u盘再导出！");
+//                }
+//
+//
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
