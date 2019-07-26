@@ -4,7 +4,7 @@ apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.wzy.lamanpro"
+        applicationId "com.wzy.love"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 4
@@ -13,7 +13,7 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
     greendao {
-        schemaVersion 8
+        schemaVersion 10
         targetGenDir 'src/main/java'
     }
     buildTypes {
@@ -45,5 +45,7 @@ dependencies {
     implementation 'com.orhanobut:logger:2.2.0'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
     implementation 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+    implementation 'com.github.mjdev:libaums:0.5.5'
+    implementation 'com.github.huangyanbin:SmartTable:2.2.0'
 
 }

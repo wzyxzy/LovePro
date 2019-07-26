@@ -10,8 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- <uses-permission android:name="android.permission.SHUTDOWN" -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
-        tools:ignore="ProtectedPermissions" />
 
     <!-- tools:ignore="ProtectedPermissions" /> -->
     <uses-permission
@@ -50,6 +48,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.wzy.lamanpro.activity.ManageHis" />
+        </activity>
+        <activity
+            android:name=".activity.GFsDetails"
+            android:label="@string/title_activity_gfs_details"
+            android:parentActivityName=".activity.Main2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.wzy.lamanpro.activity.Main2Activity" />
         </activity>
         <activity
             android:name=".activity.AddLibrary"
@@ -116,7 +122,7 @@
         <activity android:name=".activity.MainActivity" />
         <activity
             android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login"/>
+            android:label="@string/title_activity_login" />
         <activity
             android:name=".activity.Main2Activity"
             android:label="@string/title_activity_main2"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Raman Security Check</string>
+    <string name="app_name">备胎管理</string>
     <string name="title_activity_login">登陆</string>
     <!-- Strings related to login -->
     <string name="prompt_email">账号</string>
@@ -14,11 +14,11 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_main2">拉曼光谱安检分析软件</string>
+    <string name="title_activity_main2">备胎管理分析软件</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">竹天探索-拉曼</string>
-    <string name="nav_header_subtitle">ztts@wzy.com</string>
+    <string name="nav_header_title">备胎管理</string>
+    <string name="nav_header_subtitle">btgl@wzy.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">模式设定</string>
     <string name="title_activity_main3">Main3Activity</string>
@@ -102,9 +102,10 @@
     <string name="action_test_report">测试报告</string>
     <string name="action_data_copy">数据备份</string>
     <string name="title_activity_manage_users">用户管理</string>
-    <string name="title_activity_manage_data">数据库管理</string>
-    <string name="title_activity_manage_his">测试数据管理</string>
-    <string name="title_activity_add_library">建库</string>
+    <string name="title_activity_manage_data">数据管理</string>
+    <string name="title_activity_manage_his">恋爱分析</string>
+    <string name="title_activity_add_library">随机选秀</string>
     <string name="title_activity_his_details">测试数据</string>
-    <string name="title_activity_data_details">数据库管理</string>
+    <string name="title_activity_gfs_details">具体数据</string>
+    <string name="title_activity_data_details">数据管理</string>
 </resources>

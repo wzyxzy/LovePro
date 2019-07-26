@@ -8,15 +8,15 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="建库" />
+            android:title="随机选秀" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="数据库管理" />
+            android:title="数据管理" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="测试数据管理" />
+            android:title="恋爱分析" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"

@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 import com.lzy.okgo.OkGo;
+import com.lzy.okgo.cache.CacheMode;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 import com.wzy.lamanpro.BuildConfig;
@@ -40,5 +41,6 @@ public class LaManApplication extends Application {
 
     private void initOkgo() {
         OkGo.getInstance().init(this);
+        OkGo.getInstance().init(this).setCacheMode(CacheMode.REQUEST_FAILED_READ_CACHE);
     }
 }

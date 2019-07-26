@@ -8,7 +8,7 @@
     tools:context=".activity.ManageData"
     tools:showIn="@layout/activity_manage_data">
 
-    <ListView
+    <com.bin.david.form.core.SmartTable
         android:id="@+id/dataList"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

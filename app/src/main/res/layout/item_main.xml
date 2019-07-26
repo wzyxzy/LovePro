@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+
+    <TextView
+        android:id="@+id/name"
+        style="@style/item_text" />
+
+    <TextView
+        android:id="@+id/point"
+        style="@style/item_text"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
+        android:id="@+id/point_now"
+        style="@style/item_text"
+        android:textColor="@android:color/holo_blue_bright" />
+
+</LinearLayout>
